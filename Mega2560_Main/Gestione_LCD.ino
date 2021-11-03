@@ -261,18 +261,24 @@ void manageManualSelection(int rowItemManualMenu, int colItem) {
   } else {
     switch (rowItemManualMenu) {
       case 5: if (colItem == 0) {
+          config.onOffTemperatureSending = true;
           config.onOffTemperature = true;
         } else {
+          config.onOffTemperatureSending = true;
           config.onOffTemperature = false;
         }
       case 6: if (colItem == 0) {
+          config.onOffTDSSending = true;
           config.onOffTDS = true;
         } else {
+          config.onOffTDSSending = false;
           config.onOffTDS = false;
         }
       case 7: if (colItem == 0) {
+          config.onOffPhSending = true;
           config.onOffPH = true;
         } else {
+          config.onOffPhSending = false;
           config.onOffPH = false;
         }
 
@@ -352,11 +358,11 @@ void menuPageSelection(int arrowItem, int row, int whatMenu) {
   } else if (whatMenu == 9) {
     lcd.setCursor(0, 0);
     Serial.println(row);
-    if (row == 6) {
+    if (row == 8) {
       lcd.print("Send Temp is");
-    } else if (row == 7) {
+    } else if (row == 9) {
       lcd.print("Send EC is");
-    } else if (row == 8) {
+    } else if (row == 10) {
       lcd.print("Send PH is");
     }
     lcd.setCursor(13, 0);

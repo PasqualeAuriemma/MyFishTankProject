@@ -43,12 +43,14 @@ void chackIfSendTDSValue(byte pivot, byte Minute, float value, String key, DateT
   }
 }
 
+// Get a TDS value with the normalization to 25 degree because the tds value is affected to the
+// aquarium temperature
 float activateTDSMeasurement(byte pivot, byte Minute, float temper) {
   if (H % pivot == 0 && M >= Minute && M <= (Minute + 2)) {
-    float p = getTDS(temper);
-    //Serial.println("TDS = " + String(p));
-    return p;
-    
+    float tdsValue = getTDS(temper);
+    float tdsValueNormalization = (tdsValue * 25) / temper;
+    //Serial.println("TDS = " + String(tdsValueNormalization));
+    return tdsValueNormalization;
   }
 }
 
