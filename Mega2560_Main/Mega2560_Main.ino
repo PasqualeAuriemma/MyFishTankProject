@@ -50,7 +50,7 @@ const byte keypadPin = A0;
    VIN alimentazione board
    -----------------I ANALOGICI-----------------------------------
    A0 Tasti keypad
-   A1 TDS Meter v 1.0 KS0429 
+   A1 TDS Meter v 1.0 KS0429
    A2 LIBERO
    A3 LIBERO
    A4 SDA I2C RTC
@@ -65,7 +65,8 @@ byte temperatureMinAndMaxTemp[2] = {0, 0};
 int temperature = 0;
 
 byte rele[5] = {2, 3, 4, 5, 6};
-
+// ------------------  TDS Meter  --------------------------------
+bool activeContinuousTDSMeasurement = false;
 float tds = 0.0;
 // ------------------   SD varables   ----------------------------
 struct Config {
@@ -149,8 +150,9 @@ char menuItem6[maxSize] = "Riscaldatore";
 char menuItem7[maxSize] = "Ossigeno";
 char menuItem8[maxSize] = "Luci";
 char menuItem9[maxSize] = "Termometro";
-char menuItem18[maxSize] = "TDS Meter";
+char menuItem18[maxSize] = "TDS Meter Auto";
 char menuItem19[maxSize] = "PH Meter";
+char menuItem20[maxSize] = "TDS Meter Man";
 char menuItem14[maxSize] = "Temper. Send";
 char menuItem15[maxSize] = "EC Send";
 char menuItem16[maxSize] = "PH Send";
@@ -163,7 +165,7 @@ char menuItem17[maxSize] = "Riscalda Auto";
 //----------------   Initialize Menu Array   ---------------------
 char *mainMenu[4];
 int mainMenuSize = 0;
-char *manualMenu[11];
+char *manualMenu[12];
 int manualMenuSize = 0;
 char *settingMenu[5];
 int settingMenuSize = 0;
@@ -181,17 +183,17 @@ void setup() {
 
   //Set pin for TSD Meter
   pinMode(TdsSensorPin, INPUT);
-   
+
   //pinMode(PIN_LED, OUTPUT);
   //digitalWrite(PIN_LED, LOW);
-  
+
   // Initialize SD library
   if (!SD.begin(SD_PIN)) {
     Serial.println(F("Failed to initialize SD library"));
   } else {
     Serial.println(F("Initialize SD library"));
   }
- 
+
   if (SD.exists(filename)) {
     // Should load default config if run for the first time
     Serial.println(F("Loading configuration..."));
@@ -260,9 +262,10 @@ void setup() {
   manualMenu[5] = menuItem9;
   manualMenu[6] = menuItem18;
   manualMenu[7] = menuItem19;
-  manualMenu[8] = menuItem14;
-  manualMenu[9] = menuItem15;
-  manualMenu[10] = menuItem16;
+  manualMenu[8] = menuItem20;
+  manualMenu[9] = menuItem14;
+  manualMenu[10] = menuItem15;
+  manualMenu[11] = menuItem16;
   manualMenuSize = sizeof(manualMenu) / sizeof(manualMenu[0]);
   //-----------------------   Setting Menu Page   -------------------
   settingMenu[0] = menuItem10;
@@ -297,15 +300,21 @@ void loop() {
     temperature = getTemp();
   }
   
-  if (config.onOffTDS){
-    tds=activateTDSMeasurement(4, 10, temperature);  
+  //Get TDS values automatically only when it is the right time to get it 
+  if (config.onOffTDS) {
+    tds = activateTDSMeasurement(4, 10, temperature);
   }
+
+//  //Get continuous TDS values 
+//  if (activeContinuousTDSMeasurement) {
+//    tds = getTDS(temperature);
+//  }
 
   //turning on the heater automatically if it is enabled
   if (config.onOffHeater) {
     manageAcquarioumHeater(temperature);
   }
-  
+
   //Getting kayboard value
   key = getKeyValue();
   if (!menuOnOff && key == code[4]) {
@@ -332,7 +341,7 @@ void loop() {
   if (config.onOffTDSSending) {
     chackIfSendTDSValue(4, 15, float(tds), keyTDS, now);
   }
-  
+
   //menu on lcd
   if (menuOnOff) {
     menu_(key);

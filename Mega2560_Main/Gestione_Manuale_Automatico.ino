@@ -79,21 +79,21 @@ void manageAutomationProcessAndMaintenance(int item, int colItem) {
 
 void manageSendingSettings(int item, int colItem) {
   switch (item) {
-    case 6:
+    case 9:
       if (colItem == 0) {
         config.onOffTemperatureSending = true;
       } else {
         config.onOffTemperatureSending = false;
       }
       break;
-    case 7:
+    case 10:
       if (colItem == 0) {
         config.onOffTDSSending = true;
       } else {
         config.onOffTDSSending = false;
       }
       break;
-    case 8:
+    case 11:
       if (colItem == 0) {
         config.onOffPhSending = true;
       } else {

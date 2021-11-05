@@ -71,7 +71,7 @@ void menu_(int keyPad) {
       if (colItem == -1) {
         setChangingPageVariable(1, rowItemMainMenu);
       } else if (colItem == 1) {
-        if (rowItem >= 8 && rowItem <= 10) {
+        if (rowItem >= 9 && rowItem <= 11) {
           activeMenu = 9;
         } else {
           activeMenu = 4;
@@ -267,13 +267,16 @@ void manageManualSelection(int rowItemManualMenu, int colItem) {
           config.onOffTemperatureSending = true;
           config.onOffTemperature = false;
         }
+        break;
       case 6: if (colItem == 0) {
+          activeContinuousTDSMeasurement = false;
           config.onOffTDSSending = true;
           config.onOffTDS = true;
         } else {
           config.onOffTDSSending = false;
           config.onOffTDS = false;
         }
+        break;
       case 7: if (colItem == 0) {
           config.onOffPhSending = true;
           config.onOffPH = true;
@@ -281,10 +284,18 @@ void manageManualSelection(int rowItemManualMenu, int colItem) {
           config.onOffPhSending = false;
           config.onOffPH = false;
         }
-
+        break;
+      case 8: if (colItem == 0) {
+          config.onOffTDS = false;
+          activeContinuousTDSMeasurement = true;
+        } else {
+          activeContinuousTDSMeasurement = false;
+          config.onOffTDS = true;
+        }
         break;
       default: break;
     }
+    saveConfiguration(filename, config);
   }
   exitFromMenu();
 }
@@ -358,19 +369,17 @@ void menuPageSelection(int arrowItem, int row, int whatMenu) {
   } else if (whatMenu == 9) {
     lcd.setCursor(0, 0);
     Serial.println(row);
-    if (row == 8) {
+    if (row == 9) {
       lcd.print("Send Temp is");
-    } else if (row == 9) {
-      lcd.print("Send EC is");
-    } else if (row == 10) {
-      lcd.print("Send PH is");
-    }
-    lcd.setCursor(13, 0);
-    if (row == 6) {
+      lcd.setCursor(13, 0);
       lcd.print(enabledToSend(config.onOffTemperatureSending));
-    } else if (row == 7) {
+    } else if (row == 10) {
+      lcd.print("Send EC is");
+      lcd.setCursor(13, 0);
       lcd.print(enabledToSend(config.onOffTDSSending));
-    } else if (row == 8) {
+    } else if (row == 11) {
+      lcd.print("Send PH is");
+      lcd.setCursor(13, 0);
       lcd.print(enabledToSend(config.onOffPhSending));
     }
     lcd.setCursor((arrowItem * 7) + 2, 1); lcd.write(byte(6));
