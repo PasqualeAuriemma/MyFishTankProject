@@ -2,7 +2,7 @@
   Aquarium Project Pasquale
 */
 
-//The function argument pivot is very important because it decide how many times to send
+//The function argument pivot is very important because it decides how many times to send
 //the value to web site. For example, if the pivot is four the value will be sent to web
 //site eight time. The seconds should be equal to result of division between hour
 //and pivot but different from last second when it is sent the value. The division and
@@ -48,6 +48,8 @@ float activateTDSMeasurement(byte pivot, byte Minute, float temper) {
   if (H % pivot == 0 && M >= Minute && M <= (Minute + 2)) {
     //Serial.println("TDS = " + String(tdsValue));
     return getTDS(temper);
+  }else{
+    return tds;
   }
 }
 
@@ -79,21 +81,21 @@ void manageAutomationProcessAndMaintenance(int item, int colItem) {
 
 void manageSendingSettings(int item, int colItem) {
   switch (item) {
-    case 9:
+    case 8:
       if (colItem == 0) {
         config.onOffTemperatureSending = true;
       } else {
         config.onOffTemperatureSending = false;
       }
       break;
-    case 10:
+    case 9:
       if (colItem == 0) {
         config.onOffTDSSending = true;
       } else {
         config.onOffTDSSending = false;
       }
       break;
-    case 11:
+    case 10:
       if (colItem == 0) {
         config.onOffPhSending = true;
       } else {
@@ -116,7 +118,7 @@ void onAutomaticProcess() {
   config.onOffTDSSending = true;
   config.onOffPhSending = true;
   //Turning on Fish Feeder and Filter
-  manageReleSymbolAndAction(0, 0);
+  manageReleSymbolAndAction(4, 0);
   delay(500);
   manageReleSymbolAndAction(1, 0);
   delay(500);
@@ -133,8 +135,8 @@ void offAutomaticProcess() {
   config.onOffTDSSending = false;
   config.onOffPhSending = false;
   //Turning off Fish Feeder, Filter, Termometer, Ossigeno and turning on Lights
-  if (releSymbol[0] == 1) {
-    manageReleSymbolAndAction(0, 1);
+  if (releSymbol[0] == 0) {
+    manageReleSymbolAndAction(0, 0);
     delay(500);
   }
   if (releSymbol[1] == 1) {
@@ -149,8 +151,8 @@ void offAutomaticProcess() {
     manageReleSymbolAndAction(3, 1);
     delay(500);
   }
-  if (releSymbol[4] == 0) {
-    manageReleSymbolAndAction(4, 0);
+  if (releSymbol[4] == 1) {
+    manageReleSymbolAndAction(4, 1);
     delay(500);
   }
   //for(int i=0; i<numRele; i++){

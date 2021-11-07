@@ -29,11 +29,11 @@ void manageAquariumLights(int h, int m) {
 
   if (checkStart <= tempTime && checkEnd > tempTime && !tempOnOffLight) {
     tempOnOffLight = true;
-    manageReleSymbolAndAction(4, 0);
+    manageReleSymbolAndAction(0, 0);
     showReleSymbol();
   } else if (!(checkStart <= tempTime && checkEnd > tempTime ) && tempOnOffLight) {
     tempOnOffLight = false;
-    manageReleSymbolAndAction(4, 1);
+    manageReleSymbolAndAction(0, 1);
     showReleSymbol();
   }
 

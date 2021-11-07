@@ -71,7 +71,7 @@ void menu_(int keyPad) {
       if (colItem == -1) {
         setChangingPageVariable(1, rowItemMainMenu);
       } else if (colItem == 1) {
-        if (rowItem >= 9 && rowItem <= 11) {
+        if (rowItem >= 8 && rowItem <= 10) {
           activeMenu = 9;
         } else {
           activeMenu = 4;
@@ -91,6 +91,7 @@ void menu_(int keyPad) {
           case 2: activeMenu = 10; showInfoWifi(); break;
           case 3: waitingActionMenu(); reconnectWifi(); exitFromMenu();
           case 4: activeMenu = 11; break;
+          case 5: activeMenu = 14; break;
           default: break;
         }
         changingPage = true; rowItemSettingMenu = rowItem; rowItem = 0; colItem = 0;
@@ -218,13 +219,48 @@ void menu_(int keyPad) {
         if (rowItem == 2) {
           saveMinMaxTemperature(temperatureMinAndMaxTemp);
         } else if (rowItem == 3) {
-          setChangingPageVariable(2, rowItemManualMenu);
+          setChangingPageVariable(4, rowItemManualMenu);
         } else {
           break;
         }
       }
       break;
+    case 13: //Serial.println("Menu set Freq update web...");
+      manageMenuCursors(keyPad, 5, 1, 1);
+      shiftFreqUpdateMenu(keyPad, rowItem);
+      if (keyPad == code[4]) {
+        if (rowItem == 3) {
+          saveFreqUpdateWeb();
+        } else if (rowItem == 4) {
+          setChangingPageVariable(4, rowItemManualMenu);
+        } else {
+          break;
+        }
+      }
+      break;
+    case 14: //Serial.println("Menu show Frequence Updating WEB...");
+      manageMenuCursors(keyPad, 1, -1, 2);
+      if (colItem == -1) {
+        setChangingPageVariable(3, rowItemSettingMenu);
+        break;
+      }
+      showFreqUpdateSetting();
+      if (colItem == 1) {
+        freqUpdateWebTemperatureIndex = indexNumber(config.freqUpdateWebTemperature);
+        freqUpdateWebTDSIndex = indexNumber(config.freqUpdateWebTDS);
+        freqUpdateWebPHIndex = indexNumber(config.freqUpdateWebPH);
+        setChangingPageVariable(13, 0);
+      }
+      break;
     default: break;
+  }
+}
+
+int indexNumber(int freq) {
+  if (freq == 23) {
+    return indexOf(24, freqNumbber, 8);
+  } else {
+    return indexOf(freq, freqNumbber, 8);
   }
 }
 
@@ -269,7 +305,6 @@ void manageManualSelection(int rowItemManualMenu, int colItem) {
         }
         break;
       case 6: if (colItem == 0) {
-          activeContinuousTDSMeasurement = false;
           config.onOffTDSSending = true;
           config.onOffTDS = true;
         } else {
@@ -283,14 +318,6 @@ void manageManualSelection(int rowItemManualMenu, int colItem) {
         } else {
           config.onOffPhSending = false;
           config.onOffPH = false;
-        }
-        break;
-      case 8: if (colItem == 0) {
-          config.onOffTDS = false;
-          activeContinuousTDSMeasurement = true;
-        } else {
-          activeContinuousTDSMeasurement = false;
-          config.onOffTDS = true;
         }
         break;
       default: break;
@@ -369,15 +396,15 @@ void menuPageSelection(int arrowItem, int row, int whatMenu) {
   } else if (whatMenu == 9) {
     lcd.setCursor(0, 0);
     Serial.println(row);
-    if (row == 9) {
+    if (row == 8) {
       lcd.print("Send Temp is");
       lcd.setCursor(13, 0);
       lcd.print(enabledToSend(config.onOffTemperatureSending));
-    } else if (row == 10) {
+    } else if (row == 9) {
       lcd.print("Send EC is");
       lcd.setCursor(13, 0);
       lcd.print(enabledToSend(config.onOffTDSSending));
-    } else if (row == 11) {
+    } else if (row == 10) {
       lcd.print("Send PH is");
       lcd.setCursor(13, 0);
       lcd.print(enabledToSend(config.onOffPhSending));
@@ -479,6 +506,28 @@ void showLightsTimerSetting() {
   showStringNumber(12, 1, config.endMinutes);
 }
 
+void showFreqUpdateSetting() {
+  showTimeTitle(0, "SET FREQ UPDATE");
+  lcd.setCursor(1, 1); lcd.print("T:");
+  if (config.freqUpdateWebTemperature == 23) {
+    showStringNumber(3, 1, 1);
+  } else {
+    showStringNumber(3, 1, 24 / config.freqUpdateWebTemperature);
+  }
+  lcd.setCursor(6, 1); lcd.print("E:");
+  if (config.freqUpdateWebTDS == 23) {
+    showStringNumber(8, 1, 1);
+  } else {
+    showStringNumber(8, 1, 24 / config.freqUpdateWebTDS);
+  }
+  lcd.setCursor (11, 1); lcd.print("P:");
+  if (config.freqUpdateWebPH == 23) {
+    showStringNumber(13, 1, 1);
+  } else {
+    showStringNumber(13, 1, 24 / config.freqUpdateWebPH);
+  }
+}
+
 void showTemperatureSetting() {
   temperatureMinAndMaxTemp[0] = config.tempMin;
   temperatureMinAndMaxTemp[1] = config.tempMax;
@@ -517,6 +566,41 @@ void showTime() {
   showStringNumber(5, 1, oraEMinTimeClockTemp[0]);
   lcd.setCursor(7, 1); lcd.print(":");
   showStringNumber(8, 1, oraEMinTimeClockTemp[1]);
+}
+
+//Managing the cursor  to manage the updating frequence per item
+void showManageFreqSetting(int row, int t, int e, int p) {
+  lcd.clear();
+  lcd.setCursor(0, 0); lcd.print("SET");
+  lcd.setCursor (5, 0); lcd.print("T:");
+  lcd.setCursor (7, 0); lcd.print(24 / freqNumbber[t]);
+  if (row == 0) {
+    lcd.setCursor (9, 0);
+    lcd.write(5);
+  }
+  lcd.setCursor (11, 0); lcd.print("E:");
+  lcd.setCursor (13, 0); lcd.print(24 / freqNumbber[e]);
+  if (row == 1) {
+    lcd.setCursor (15, 0);
+    lcd.write(5);
+  }
+  lcd.setCursor (0, 1); lcd.print("FREQ");
+  lcd.setCursor (5, 1); lcd.print("P:");
+  lcd.setCursor (7, 1); lcd.print(24 / freqNumbber[p]);
+  if (row == 2) {
+    lcd.setCursor (9, 1);
+    lcd.write(5);
+  }
+  lcd.setCursor (10, 1); lcd.print("OK");
+  if (row == 3) {
+    lcd.setCursor (12, 1);
+    lcd.write(6);
+  }
+  lcd.setCursor (13, 1); lcd.print("<-");
+  if (row == 4) {
+    lcd.setCursor (15, 1);
+    lcd.write(6);
+  }
 }
 
 //Managing the cursor that selects the temperature to manage the termometer
@@ -610,6 +694,17 @@ void shiftTemperatureMenu(int keyPad, String firstS, int row, byte *minMax) {
   manageTemperatureSetting(row, firstS, minMax[0], minMax[1]);
 }
 
+void shiftFreqUpdateMenu(int keyPad, int row) {
+  if (row == 0) {
+    freqUpdateWebTemperatureIndex = manageMenuRangeNumberCursors(keyPad, row , freqUpdateWebTemperatureIndex, 8);
+  } else if (row == 1) {
+    freqUpdateWebTDSIndex = manageMenuRangeNumberCursors(keyPad, row, freqUpdateWebTDSIndex, 8);
+  } else if (row == 2) {
+    freqUpdateWebPHIndex = manageMenuRangeNumberCursors(keyPad, row, freqUpdateWebPHIndex, 8);
+  }
+  showManageFreqSetting(row, freqUpdateWebTemperatureIndex, freqUpdateWebTDSIndex, freqUpdateWebPHIndex);
+}
+
 void shiftHourAndMinutesMenu(int i, int j, int keyPad, String firstS, String secondS, int row, byte *oraEMin) {
   if (row == 0) {
     oraEMin[i] = manageMenuRangeNumberCursors(keyPad, row , oraEMin[i], 24);
@@ -620,19 +715,19 @@ void shiftHourAndMinutesMenu(int i, int j, int keyPad, String firstS, String sec
 }
 
 // Managing the cursor to move inside the menu
-int manageMenuRangeNumberCursors(int keyPad, int row, int hourMin, int maxItem) {
+int manageMenuRangeNumberCursors(int keyPad, int row, int number, int maxItem) {
   switch (keyPad) {
-    case 1: if (hourMin == maxItem - 1) {
+    case 1: if (number == maxItem - 1) {
         return 0;
       } else {
-        return ++hourMin;
+        return ++number;
       }
-    case 2: if (hourMin == 0) {
+    case 2: if (number == 0) {
         return maxItem - 1;
       } else {
-        return --hourMin;
+        return --number;
       }
-    default: return hourMin;
+    default: return number;
   }
 }
 
@@ -651,4 +746,39 @@ void saveMinMaxTemperature(byte *minMax) {
   config.tempMax = minMax[1];
   saveConfiguration(filename, config);
   exitFromMenu();
+}
+
+void saveFreqUpdateWeb() {
+
+  config.freqUpdateWebTemperature = setFreq(freqUpdateWebTemperatureIndex);
+  config.freqUpdateWebTDS = setFreq(freqUpdateWebTDSIndex);
+  config.freqUpdateWebPH = setFreq(freqUpdateWebPHIndex);
+  waitingActionMenu();
+  saveConfiguration(filename, config);
+  exitFromMenu();
+}
+
+int setFreq(int freq) {
+  if (freq == 0) {
+    return 23;
+  } else {
+    return freqNumbber[freq];
+  }
+
+}
+
+// Return index of element starting
+// Return -1 if element is not present
+int indexOf(const int elm, const int *ar, int ar_cnt) {
+  // decreasing array count till it reaches negative
+  // arr_cnt - 1 to 0
+  while (ar_cnt--)
+  {
+    // Return array index if current element equals provided element
+    if (ar[ar_cnt] == elm)
+      return ar_cnt;
+  }
+
+  // Element not present
+  return -1; // Should never reaches this point
 }

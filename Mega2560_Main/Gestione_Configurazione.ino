@@ -38,6 +38,9 @@ void loadConfiguration(const char *filename, Config &config) {
   config.onOffTemperatureSending = doc["onOffTemperatureSending"];
   config.onOffTDSSending = doc["onOffTDSSending"];
   config.onOffPhSending = doc["onOffPhSending"];
+  config.freqUpdateWebTemperature = doc["freqUpdateWebTemperature"];
+  config.freqUpdateWebTDS = doc["freqUpdateWebTDS"];
+  config.freqUpdateWebPH = doc["freqUpdateWebPH"];
   strlcpy(config.hostname,                  // <- destination
           doc["hostname"] | "example.com",  // <- source
           sizeof(config.hostname));         // <- destination's capacity
@@ -81,6 +84,9 @@ void saveConfiguration(const char *filename, const Config &config) {
   doc["onOffTemperatureSending"] = config.onOffTemperatureSending;
   doc["onOffTDSSending"] = config.onOffTDSSending;
   doc["onOffPhSending"] = config.onOffPhSending;
+  doc["freqUpdateWebTemperature"] = config.freqUpdateWebTemperature;
+  doc["freqUpdateWebTDS"] = config.freqUpdateWebTDS;
+  doc["freqUpdateWebPH"] = config.freqUpdateWebPH;
   doc["hostname"] = config.hostname;
 
   // Serialize JSON to file
@@ -127,6 +133,9 @@ void setConfiguration(const char *filename, Config &config) {
   doc["onOffTemperatureSending"] = false;
   doc["onOffTDSSending"] = false;
   doc["onOffPhSending"] = false;
+  doc["freqUpdateWebTemperature"] = 0;
+  doc["freqUpdateWebTDS"] = 0;
+  doc["freqUpdateWebPH"] = 0;
   doc["hostname"] = "myfishtank.altervista.org";
   config.startHour = doc["startHour"];
   config.startMinutes = doc["startMinutes"];
@@ -145,6 +154,9 @@ void setConfiguration(const char *filename, Config &config) {
   config.onOffTemperatureSending = doc["onOffTemperatureSending"];
   config.onOffTDSSending = doc["onOffTDSSending"];
   config.onOffPhSending = doc["onOffPhSending"];
+  config.freqUpdateWebTemperature = doc["freqUpdateWebTemperature"];
+  config.freqUpdateWebTDS = doc["freqUpdateWebTDS"];
+  config.freqUpdateWebPH = doc["freqUpdateWebPH"];
   strlcpy(config.hostname,                  // <- destination
           doc["hostname"] | "example.com",  // <- source
           sizeof(config.hostname));         // <- destination's capacity

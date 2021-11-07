@@ -63,11 +63,15 @@ byte oraEMinTimeClockTemp[2] = {0, 0};
 byte oraEMinTemp[4] = {0, 0, 0, 0};
 byte temperatureMinAndMaxTemp[2] = {0, 0};
 int temperature = 0;
-
+int freqNumbber[8] = {24, 12, 8, 6, 4, 3, 2, 1};
+int freqUpdateWebTemperatureIndex = 0;
+int freqUpdateWebTDSIndex = 0;
+int freqUpdateWebPHIndex = 0;
 byte rele[5] = {2, 3, 4, 5, 6};
 // ------------------  TDS Meter  --------------------------------
 bool activeContinuousTDSMeasurement = false;
 float tds = 0.0;
+float tds_continuous = 0.0;
 // ------------------   SD varables   ----------------------------
 struct Config {
   int startHour;
@@ -87,6 +91,9 @@ struct Config {
   bool onOffTemperatureSending;
   bool onOffTDSSending;
   bool onOffPhSending;
+  int freqUpdateWebTemperature;
+  int freqUpdateWebTDS;
+  int freqUpdateWebPH;
   char hostname[64];
 };
 const char *filename = "SETTINGS.TXT";  // <- SD library uses 8.3 filenames
@@ -144,30 +151,30 @@ char menuItem1[maxSize] = "Manuale";
 char menuItem2[maxSize] = "Manutenzione";
 char menuItem3[maxSize] = "Impostazioni";
 //---------------------   Manuale   -----------------------------
-char menuItem4[maxSize] = "Mangiatoia";
+char menuItem4[maxSize] = "Luci";
 char menuItem5[maxSize] = "Filtro";
 char menuItem6[maxSize] = "Riscaldatore";
 char menuItem7[maxSize] = "Ossigeno";
-char menuItem8[maxSize] = "Luci";
+char menuItem8[maxSize] = "Mangiatoia";
 char menuItem9[maxSize] = "Termometro";
-char menuItem18[maxSize] = "TDS Meter Auto";
+char menuItem18[maxSize] = "TDS Meter";
 char menuItem19[maxSize] = "PH Meter";
-char menuItem20[maxSize] = "TDS Meter Man";
-char menuItem14[maxSize] = "Temper. Send";
-char menuItem15[maxSize] = "EC Send";
-char menuItem16[maxSize] = "PH Send";
+char menuItem14[maxSize] = "Enable T Send";
+char menuItem15[maxSize] = "Enable EC Send";
+char menuItem16[maxSize] = "Enable PH Send";
 //-----------------------   Settings   --------------------------
-char menuItem10[maxSize] = "Timer Luci";
-char menuItem11[maxSize] = "Orario";
+char menuItem10[maxSize] = "Set Timer Luci";
+char menuItem11[maxSize] = "Set Orario";
 char menuItem12[maxSize] = "Conn. Status";
 char menuItem13[maxSize] = "Reconnect";
-char menuItem17[maxSize] = "Riscalda Auto";
+char menuItem17[maxSize] = "Set Heater Auto";
+char menuItem20[maxSize] = "Set Freq to web";
 //----------------   Initialize Menu Array   ---------------------
 char *mainMenu[4];
 int mainMenuSize = 0;
-char *manualMenu[12];
+char *manualMenu[11];
 int manualMenuSize = 0;
-char *settingMenu[5];
+char *settingMenu[6];
 int settingMenuSize = 0;
 
 //--------------------   Serial3 Variables -----------------------
@@ -193,7 +200,7 @@ void setup() {
   } else {
     Serial.println(F("Initialize SD library"));
   }
-
+  
   if (SD.exists(filename)) {
     // Should load default config if run for the first time
     Serial.println(F("Loading configuration..."));
@@ -212,7 +219,7 @@ void setup() {
   RTC.begin();
   //Initialize Display LCD
   lcd.init();
-
+  RTC.adjust(DateTime(__DATE__, __TIME__));
   //Setting the analogue pin for input and turn on the internal pullup resistor
   pinMode(keypadPin, INPUT_PULLUP);
   for (int i = 0; i < numRele; i++) {
@@ -262,10 +269,9 @@ void setup() {
   manualMenu[5] = menuItem9;
   manualMenu[6] = menuItem18;
   manualMenu[7] = menuItem19;
-  manualMenu[8] = menuItem20;
-  manualMenu[9] = menuItem14;
-  manualMenu[10] = menuItem15;
-  manualMenu[11] = menuItem16;
+  manualMenu[8] = menuItem14;
+  manualMenu[9] = menuItem15;
+  manualMenu[10] = menuItem16;
   manualMenuSize = sizeof(manualMenu) / sizeof(manualMenu[0]);
   //-----------------------   Setting Menu Page   -------------------
   settingMenu[0] = menuItem10;
@@ -273,6 +279,7 @@ void setup() {
   settingMenu[2] = menuItem12;
   settingMenu[3] = menuItem13;
   settingMenu[4] = menuItem17;
+  settingMenu[5] = menuItem20;
   settingMenuSize = sizeof(settingMenu) / sizeof(settingMenu[0]);
 }
 
@@ -302,13 +309,8 @@ void loop() {
   
   //Get TDS values automatically only when it is the right time to get it 
   if (config.onOffTDS) {
-    tds = activateTDSMeasurement(4, 10, temperature);
+    tds = activateTDSMeasurement(config.freqUpdateWebTDS, 10, temperature);
   }
-
-//  //Get continuous TDS values 
-//  if (activeContinuousTDSMeasurement) {
-//    tds = getTDS(temperature);
-//  }
 
   //turning on the heater automatically if it is enabled
   if (config.onOffHeater) {
@@ -325,21 +327,21 @@ void loop() {
 
   //  Serial.println("TEMPERATURE = " + String(temperature));
   //  Serial.println("KEY PAD VALUE = " + String(key));
-  //  Serial.println("previous MENU" + String(previousMenu));
-  //  Serial.println("menu = " + String(activeMenu));
-  //  Serial.println("ESCAPE = " + String(escape));
+  //  Serial.println("ACTIVE MENU = " + String(activeMenu));
+  //  Serial.println("MENU = " + String(menuOnOff));
+  //  Serial.println("TDS = " + String(tds));
 
   //Check when turning on the screen backlight
   checkScreenBeckLight(key);
 
   //Sent the temperature to WEB DB
   if (config.onOffTemperatureSending) {
-    chackIfSendTempValue(4, 0, temperature, keyTemp, now);
+    chackIfSendTempValue(config.freqUpdateWebTemperature, 0, temperature, keyTemp, now);
   }
 
   //Sent the TDS to WEB DB 5 minute later than tds measurement
   if (config.onOffTDSSending) {
-    chackIfSendTDSValue(4, 15, float(tds), keyTDS, now);
+    chackIfSendTDSValue(config.freqUpdateWebTDS, 15, float(tds), keyTDS, now);
   }
 
   //menu on lcd
