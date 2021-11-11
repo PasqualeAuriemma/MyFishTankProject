@@ -1,7 +1,7 @@
 /*
   Aquarium Project Pasquale
 */
-
+char monthNames[][3] = { "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec" };
 char activationString[maxSize] = "Vuoi Attivare?";
 char chooseString[maxSize] = "Scegli ON o OFF";
 char waitingString[maxSize] = "Attendere...";
@@ -88,10 +88,11 @@ void menu_(int keyPad) {
         switch (rowItem) {
           case 0: activeMenu = 6; break;
           case 1: activeMenu = 6; break;
-          case 2: activeMenu = 10; showInfoWifi(); break;
-          case 3: waitingActionMenu(); reconnectWifi(); exitFromMenu();
-          case 4: activeMenu = 11; break;
-          case 5: activeMenu = 14; break;
+          case 2: activeMenu = 6; break;
+          case 3: activeMenu = 10; showInfoWifi(); break;
+          case 4: waitingActionMenu(); reconnectWifi(); exitFromMenu();
+          case 5: activeMenu = 11; break;
+          case 6: activeMenu = 14; break;
           default: break;
         }
         changingPage = true; rowItemSettingMenu = rowItem; rowItem = 0; colItem = 0;
@@ -131,17 +132,19 @@ void menu_(int keyPad) {
       }
       if (rowItemSettingMenu == 0) {
         showLightsTimerSetting();
-      } else {
+      } else if (rowItemSettingMenu == 1) {
         showTime();
+      } else {
+        showDate();
       }
       if (colItem == 1) {
         setChangingPageVariable(7, 0);
       }
       break;
     case 7: //Serial.println("Menu set start time or real time...");
-      manageMenuCursors(keyPad, 4, 1, 1);
       switch (rowItemSettingMenu) {
         case 0:
+          manageMenuCursors(keyPad, 4, 1, 1);
           shiftHourAndMinutesMenu(0, 1, keyPad, "Start", "Time", rowItem, oraEMinTemp);
           if (keyPad == code[4]) {
             if (rowItem == 2) {
@@ -156,11 +159,25 @@ void menu_(int keyPad) {
           }
           break;
         case 1:
+          manageMenuCursors(keyPad, 4, 1, 1);
           shiftHourAndMinutesMenu(0, 1, keyPad, "Real", "Time", rowItem, oraEMinTimeClockTemp);
           if (keyPad == code[4]) {
             if (rowItem == 2) {
               saveTime(oraEMinTemp);
             } else if (rowItem == 3) {
+              setChangingPageVariable(3, rowItemSettingMenu);
+            } else {
+              break;
+            }
+          }
+          break;
+        case 2:
+          manageMenuCursors(keyPad, 5, 1, 1);
+          setDateMenu(0, 1, 2, keyPad, rowItem, dateTemp);
+          if (keyPad == code[4]) {
+            if (rowItem == 3) {
+              saveDate(dateTemp);
+            } else if (rowItem == 4) {
               setChangingPageVariable(3, rowItemSettingMenu);
             } else {
               break;
@@ -201,7 +218,7 @@ void menu_(int keyPad) {
       connectionStatusPage();
       exitFromMenu();
       break;
-    case 11: //Serial.println("Menu show time...");
+    case 11: //Serial.println("Menu show min - max temperature...");
       manageMenuCursors(keyPad, 1, -1, 2);
       if (colItem == -1) {
         setChangingPageVariable(2, rowItemManualMenu);
@@ -214,7 +231,7 @@ void menu_(int keyPad) {
       break;
     case 12: //Serial.println("Menu set temperature...");
       manageMenuCursors(keyPad, 4, 1, 1);
-      shiftTemperatureMenu(keyPad, "setGrad", rowItem, temperatureMinAndMaxTemp);
+      setTemperatureMenu(keyPad, "setGrad", rowItem, temperatureMinAndMaxTemp);
       if (keyPad == code[4]) {
         if (rowItem == 2) {
           saveMinMaxTemperature(temperatureMinAndMaxTemp);
@@ -227,7 +244,7 @@ void menu_(int keyPad) {
       break;
     case 13: //Serial.println("Menu set Freq update web...");
       manageMenuCursors(keyPad, 5, 1, 1);
-      shiftFreqUpdateMenu(keyPad, rowItem);
+      setFreqUpdateMenu(keyPad, rowItem);
       if (keyPad == code[4]) {
         if (rowItem == 3) {
           saveFreqUpdateWeb();
@@ -497,7 +514,7 @@ void showLightsTimerSetting() {
   oraEMinTemp[1] = config.startMinutes;
   oraEMinTemp[2] = config.endHour;
   oraEMinTemp[3] = config.endMinutes;
-  showTimeTitle(0, "Set Timer Luci ");
+  showTitle(0, "Set Timer Luci ");
   showStringNumber(2, 1, config.startHour);
   lcd.setCursor(4, 1); lcd.print(":");
   showStringNumber(5, 1, config.startMinutes);
@@ -507,7 +524,7 @@ void showLightsTimerSetting() {
 }
 
 void showFreqUpdateSetting() {
-  showTimeTitle(0, "SET FREQ UPDATE");
+  showTitle(0, "SET FREQ UPDATE");
   lcd.setCursor(1, 1); lcd.print("T:");
   if (config.freqUpdateWebTemperature == 23) {
     showStringNumber(3, 1, 1);
@@ -531,7 +548,7 @@ void showFreqUpdateSetting() {
 void showTemperatureSetting() {
   temperatureMinAndMaxTemp[0] = config.tempMin;
   temperatureMinAndMaxTemp[1] = config.tempMax;
-  showTimeTitle(0, "Set Riscalda.");
+  showTitle(0, "Set Riscalda.");
   lcd.setCursor(1, 1); lcd.print("MIN:");
   showStringNumber(5, 1, config.tempMin);
   lcd.setCursor(8, 1); lcd.print("MAX:");
@@ -548,7 +565,7 @@ void showStringNumber(byte i, byte j, byte number) {
   }
 }
 
-void showTimeTitle(byte i, String title) {
+void showTitle(byte i, String title) {
   lcd.setCursor (0, 0); lcd.print("                ");
   lcd.setCursor (i, 0); lcd.print(title);
   lcd.setCursor (15, 0); lcd.write(6);
@@ -562,10 +579,23 @@ void showTime() {
   //  Serial.println(RTC.now().minute());
   //  Serial.println(oraEMinTimeClockTemp[0]);
   //  Serial.println(oraEMinTimeClockTemp[1]);
-  showTimeTitle(1, "Set Orario");
+  showTitle(1, "Set Orario");
   showStringNumber(5, 1, oraEMinTimeClockTemp[0]);
   lcd.setCursor(7, 1); lcd.print(":");
   showStringNumber(8, 1, oraEMinTimeClockTemp[1]);
+}
+
+
+void showDate() {
+  dateTemp[0] = RTC.now().day();
+  dateTemp[1] = RTC.now().month();
+  dateTemp[2] = RTC.now().year();
+  showTitle(1, "Set Data");
+  showStringNumber(3, 1, dateTemp[0]);
+  lcd.setCursor(5, 1); lcd.print("/");
+  showStringNumber(6, 1, dateTemp[1]);
+  lcd.setCursor(8, 1); lcd.print("/");
+  lcd.setCursor(9, 1); lcd.print(dateTemp[2]);
 }
 
 //Managing the cursor  to manage the updating frequence per item
@@ -599,6 +629,49 @@ void showManageFreqSetting(int row, int t, int e, int p) {
   lcd.setCursor (13, 1); lcd.print("<-");
   if (row == 4) {
     lcd.setCursor (15, 1);
+    lcd.write(6);
+  }
+}
+
+//Managing the cursor that selects the temperature to manage the termometer
+void showDateSetting(int row, int y, int m, int d) {
+  lcd.clear();
+  lcd.setCursor(0, 0); lcd.print("Data");
+  if (row == 0) {
+    lcd.setCursor (1, 1);
+    lcd.write(6);
+  }
+  lcd.setCursor (2, 1); lcd.print(y);
+  if (row == 0) {
+    lcd.setCursor (6, 1);
+    lcd.write(5);
+  }
+  if (row == 1) {
+    lcd.setCursor (7, 1);
+    lcd.write(6);
+  }
+  lcd.setCursor (8, 1); lcd.print(m);
+  if (row == 1) {
+    lcd.setCursor (10, 1);
+    lcd.write(5);
+  }
+  if (row == 2) {
+    lcd.setCursor (11, 1);
+    lcd.write(6);
+  }
+  lcd.setCursor(12, 1); lcd.print(d);
+  if (row == 2) {
+    lcd.setCursor (14, 1);
+    lcd.write(5);
+  }
+  lcd.setCursor (8, 0); lcd.print("OK");
+  if (row == 3) {
+    lcd.setCursor (10, 0);
+    lcd.write(6);
+  }
+  lcd.setCursor (13, 0); lcd.print("<-");
+  if (row == 4) {
+    lcd.setCursor (15, 0);
     lcd.write(6);
   }
 }
@@ -685,44 +758,96 @@ void saveTimerLights(byte *oraEMin) {
   exitFromMenu();
 }
 
-void shiftTemperatureMenu(int keyPad, String firstS, int row, byte *minMax) {
+void setTemperatureMenu(int keyPad, String firstS, int row, byte *minMax) {
   if (row == 0) {
-    minMax[0] = manageMenuRangeNumberCursors(keyPad, row , minMax[0], 99);
+    minMax[0] = manageMenuRangeNumberCursors(keyPad, row , minMax[0], 0, 99);
   } else if (row == 1) {
-    minMax[1] = manageMenuRangeNumberCursors(keyPad, row, minMax[1], 99);
+    minMax[1] = manageMenuRangeNumberCursors(keyPad, row, minMax[1], 0, 99);
   }
   manageTemperatureSetting(row, firstS, minMax[0], minMax[1]);
 }
 
-void shiftFreqUpdateMenu(int keyPad, int row) {
+void setFreqUpdateMenu(int keyPad, int row) {
   if (row == 0) {
-    freqUpdateWebTemperatureIndex = manageMenuRangeNumberCursors(keyPad, row , freqUpdateWebTemperatureIndex, 8);
+    freqUpdateWebTemperatureIndex = manageMenuRangeNumberCursors(keyPad, row , freqUpdateWebTemperatureIndex, 0, 8);
   } else if (row == 1) {
-    freqUpdateWebTDSIndex = manageMenuRangeNumberCursors(keyPad, row, freqUpdateWebTDSIndex, 8);
+    freqUpdateWebTDSIndex = manageMenuRangeNumberCursors(keyPad, row, freqUpdateWebTDSIndex, 0, 8);
   } else if (row == 2) {
-    freqUpdateWebPHIndex = manageMenuRangeNumberCursors(keyPad, row, freqUpdateWebPHIndex, 8);
+    freqUpdateWebPHIndex = manageMenuRangeNumberCursors(keyPad, row, freqUpdateWebPHIndex, 0, 8);
   }
   showManageFreqSetting(row, freqUpdateWebTemperatureIndex, freqUpdateWebTDSIndex, freqUpdateWebPHIndex);
 }
 
 void shiftHourAndMinutesMenu(int i, int j, int keyPad, String firstS, String secondS, int row, byte *oraEMin) {
   if (row == 0) {
-    oraEMin[i] = manageMenuRangeNumberCursors(keyPad, row , oraEMin[i], 24);
+    oraEMin[i] = manageMenuRangeNumberCursors(keyPad, row , oraEMin[i], 0, 24);
   } else if (row == 1) {
-    oraEMin[j] = manageMenuRangeNumberCursors(keyPad, row, oraEMin[j], 60);
+    oraEMin[j] = manageMenuRangeNumberCursors(keyPad, row, oraEMin[j], 0, 60);
   }
   manageLightsTimerSetting(row, firstS, secondS, oraEMin[i], oraEMin[j]);
 }
 
-// Managing the cursor to move inside the menu
-int manageMenuRangeNumberCursors(int keyPad, int row, int number, int maxItem) {
+void setDateMenu(byte i, byte j, byte z, int keyPad, int row, int *date) {
+  if (row == 0) {
+    date[z] = manageYearRangeCursor(keyPad, row, date[z], 2060);
+  } else if (row == 1) {
+    date[j] = manageMenuRangeNumberCursors(keyPad, row, date[j], 1, 13);
+  } else {
+    date[i] = manageDayRangeCursor(keyPad, row , date[j],  date[z], date[i]);
+  }
+  if (date[i] > _get_max_day(short(date[j] - 1), date[z])) {
+    date[i] = _get_max_day(short(date[j] - 1), date[z]);
+  }
+  showDateSetting(row, date[z], date[j], date[i]);
+}
+
+// Managing the cursor to move inside the menu for year setting
+int manageYearRangeCursor(int keyPad, int row, int number, int maxItem) {
   switch (keyPad) {
+      if (number == 0) {
+        number = 2020;
+      }
     case 1: if (number == maxItem - 1) {
-        return 0;
+        return 2020;
       } else {
         return ++number;
       }
-    case 2: if (number == 0) {
+    case 2: if (number == 2020) {
+        return maxItem - 1;
+      } else {
+        return --number;
+      }
+    default: return number;
+  }
+}
+
+// Managing the cursor to move inside the menu for year setting
+int manageDayRangeCursor(int keyPad, int row, int _month, int _year, int number) {
+  switch (keyPad) {
+    case 1: if (number == _get_max_day((short(_month - 1)), _year)) {
+        return 1;
+      } else {
+        return ++number;
+      }
+    case 2:
+      if (number == 1) {
+        return _get_max_day(short(_month - 1), _year);
+      } else {
+        return --number;
+      }
+    default: return number;
+  }
+}
+
+// Managing the cursor to move inside the menu
+int manageMenuRangeNumberCursors(int keyPad, int row, int number, int minItem, int maxItem) {
+  switch (keyPad) {
+    case 1: if (number == maxItem - 1) {
+        return minItem;
+      } else {
+        return ++number;
+      }
+    case 2: if (number == minItem) {
         return maxItem - 1;
       } else {
         return --number;
@@ -737,6 +862,53 @@ void saveTime(byte *oraEMin) {
   sprintf(timeBuffer, "%02d:%02d:00", oraEMinTimeClockTemp[0], oraEMinTimeClockTemp[1]);
   //  Serial.println("Time buffer: " + String(timeBuffer));
   RTC.adjust(DateTime(__DATE__, timeBuffer));
+  exitFromMenu();
+}
+
+short _get_max_day(short month, int year) {
+  if (month == 0 || month == 2 || month == 4 || month == 6 || month == 7 || month == 9 || month == 11)
+    return 31;
+  else if (month == 3 || month == 5 || month == 8 || month == 10)
+    return 30;
+  else {
+    if (year % 4 == 0) {
+      if (year % 100 == 0) {
+        if (year % 400 == 0)
+          return 29;
+        return 28;
+      }
+      return 29;
+    }
+    return 28;
+  }
+}
+
+enum monthw { January = 1, February, March, April, May, June, July, August, September, October, November, December };
+
+const char *monthName(int m) {
+  switch (m) {
+    case 1: return "Jan";
+    case 2: return "Feb";
+    case 3: return "Mar";
+    case 4: return "Apr";
+    case 5: return "May";
+    case 6: return "Jun";
+    case 7: return "Jul";
+    case 8: return "Aug";
+    case 9: return "Sep";
+    case 10: return "Oct";
+    case 11: return "Nov";
+    case 12: return "Dec";
+    default: return "Jan";
+  }
+}
+
+void saveDate(int *date) {
+  waitingActionMenu();
+  char dateBuffer[11];
+  sprintf(dateBuffer, "%s %02d %04d",  monthName(date[1]), date[0], date[2]);
+  //Serial.println("Date buffer: " + String(dateBuffer));
+  RTC.adjust(DateTime(dateBuffer, __TIME__));
   exitFromMenu();
 }
 

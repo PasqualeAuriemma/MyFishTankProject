@@ -1,6 +1,7 @@
 /*
   Aquarium Project Pasquale
 */
+#include <string.h>
 #include <ArduinoJson.h>
 #include <SD.h>
 #include <SPI.h>
@@ -60,6 +61,7 @@ const byte keypadPin = A0;
 /****************************************************************/
 // Global Variables
 byte oraEMinTimeClockTemp[2] = {0, 0};
+int dateTemp[3] = {0, 0, 0};
 byte oraEMinTemp[4] = {0, 0, 0, 0};
 byte temperatureMinAndMaxTemp[2] = {0, 0};
 int temperature = 0;
@@ -165,6 +167,7 @@ char menuItem16[maxSize] = "Enable PH Send";
 //-----------------------   Settings   --------------------------
 char menuItem10[maxSize] = "Set Timer Luci";
 char menuItem11[maxSize] = "Set Orario";
+char menuItem21[maxSize] = "Set Data";
 char menuItem12[maxSize] = "Conn. Status";
 char menuItem13[maxSize] = "Reconnect";
 char menuItem17[maxSize] = "Set Heater Auto";
@@ -174,7 +177,7 @@ char *mainMenu[4];
 int mainMenuSize = 0;
 char *manualMenu[11];
 int manualMenuSize = 0;
-char *settingMenu[6];
+char *settingMenu[7];
 int settingMenuSize = 0;
 
 //--------------------   Serial3 Variables -----------------------
@@ -219,7 +222,7 @@ void setup() {
   RTC.begin();
   //Initialize Display LCD
   lcd.init();
-  RTC.adjust(DateTime(__DATE__, __TIME__));
+  //RTC.adjust(DateTime(__DATE__, __TIME__));
   //Setting the analogue pin for input and turn on the internal pullup resistor
   pinMode(keypadPin, INPUT_PULLUP);
   for (int i = 0; i < numRele; i++) {
@@ -276,10 +279,11 @@ void setup() {
   //-----------------------   Setting Menu Page   -------------------
   settingMenu[0] = menuItem10;
   settingMenu[1] = menuItem11;
-  settingMenu[2] = menuItem12;
-  settingMenu[3] = menuItem13;
-  settingMenu[4] = menuItem17;
-  settingMenu[5] = menuItem20;
+  settingMenu[2] = menuItem21;
+  settingMenu[3] = menuItem12;
+  settingMenu[4] = menuItem13;
+  settingMenu[5] = menuItem17;
+  settingMenu[6] = menuItem20;
   settingMenuSize = sizeof(settingMenu) / sizeof(settingMenu[0]);
 }
 
@@ -338,7 +342,7 @@ void loop() {
   if (config.onOffTemperatureSending) {
     chackIfSendTempValue(config.freqUpdateWebTemperature, 0, temperature, keyTemp, now);
   }
-
+  
   //Sent the TDS to WEB DB 5 minute later than tds measurement
   if (config.onOffTDSSending) {
     chackIfSendTDSValue(config.freqUpdateWebTDS, 15, float(tds), keyTDS, now);
