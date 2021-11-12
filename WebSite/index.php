@@ -9,7 +9,7 @@
 		<title>PIA12 FISH TANK - AQUARIUM</title>
 		<meta charset="utf-8" />
 		<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
-		<link rel="stylesheet" href="sito/assets/css/main8.css" />
+		<link rel="stylesheet" href="assets/css/main14.css" />
     <?php
       include("connection.php");
       if ($conn->connect_error) {
@@ -18,11 +18,13 @@
       $sqlT = "SELECT temperature, data_send as send FROM my_myfishtank.temp_tab ORDER BY data_send DESC limit 1";
       $sqlEC = "SELECT ec, data_send as send FROM my_myfishtank.ec_tab ORDER BY data_send DESC limit 1";
       $sqlTDS = "SELECT tds, data_send as send FROM my_myfishtank.tds_tab ORDER BY data_send DESC limit 1";
+      $sqlPH = "SELECT ph, data_send as send FROM my_myfishtank.ph_tab ORDER BY data_send DESC limit 1";
           
       $resultT = $conn->query($sqlT);
       $resultEC = $conn->query($sqlEC);
       $resultTDS = $conn->query($sqlTDS);
-     
+      $resultPH = $conn->query($sqlPH);
+      
       if ($resultT->num_rows > 0) {
         // output data of each row
         while($rowT = $resultT->fetch_assoc()) {
@@ -54,6 +56,17 @@
       } else {
         $tds = 0;
         $sendTDS = "no data";
+      }
+      
+       if ($resultPH->num_rows > 0) {
+        // output data of each row
+        while($rowPH = $resultPH->fetch_assoc()) {
+          $ph = $rowPH["ph"];
+          $sendPH = $rowPH["send"];
+        }
+      } else {
+        $ph = 0;
+        $sendPH = "no data";
       }
       
       $conn->close();
@@ -93,101 +106,92 @@
         <div class="container">
           <div class="carousel" data-flickity='{ "wrapAround": true, "autoPlay": true, "imagesLoaded":true }'>
               <div class="carousel-cell">
-                  <img class="w3-image" src="images\aquarium.jpg">
+                  <img class="w3-image" src="images\acquarium.jpg">
               </div>
               <div class="carousel-cell">
-                  <img class="w3-image" src="images\aquarium1.jpg">
+                  <img class="w3-image" src="images\acquarium1.jpg">
               </div>
               <div class="carousel-cell">
-                  <img class="w3-image" src="images\aquarium2.jpg">
+                  <img class="w3-image" src="images\acquarium2.jpg">
               </div>
               <div class="carousel-cell">
-                  <img class="w3-image" src="images\aquarium3.jpg">
+                  <img class="w3-image" src="images\acquarium3.jpg">
               </div>
               <div class="carousel-cell">
-                  <img class="w3-image" src="images\aquarium4.jpg">
+                  <img class="w3-image" src="images\acquarium4.jpg">
               </div>
           </div>
         </div>
       </section>
       <!-- DashBoard -->        
-      <section id="highlights" class="wrapper style3">
-        <div class="title">DashBoard</div>
+      <section id="highlights" class="wrapper style1">
+        <div class="title">Temperature</div>
         <div class="container">
-          <div class="row aln-center">
-            <div class="col-4 col-12-medium">
-              <section class="highlight">
-                <h3>Temperature</h3>
-                <p class="style4"> Recorded on <?php echo gmdate("l jS \of F Y", $sendT). " at ".gmdate("H:i:s", $sendT);?></p>
+                <center><p class="style4"> Recorded on <?php echo gmdate("l jS \of F Y", $sendT). " at ".gmdate("H:i:s", $sendT);?></p></center>
                 <div class="container_chart">
                   <div class="row_chart">        
 			        <div id="chart_temp"></div>
                   </div>
                 </div>    
-                <ul class="actions">
+                <center><ul class="actions">
                   <li><a href="temperature.php" class="button style3">More Details</a></li>
-                </ul>
-			  </section>
-			</div>
+                </ul></center>
+        </div>
+      </section>
+      <!-- Main -->
+      <section id="main" class="wrapper style5">
+        <div class="title">EC &amp TDS</div>
+        <div class="container">
+        <center>
+          <p class="style4"> Recorded on <?php echo gmdate("l jS \of F Y", $sendEC). " at ".gmdate("H:i:s", $sendEC);?></p>
+        </center>
+        <div class="row aln-center">
 			<div class="col-4 col-12-medium">
 			  <section class="highlight">
-                <h3>Conductivity</h3>
-                <p class="style4"> Recorded on <?php echo gmdate("l jS \of F Y", $sendEC). " at ".gmdate("H:i:s", $sendEC);?></p>
 			    <div class="container_chart">
                   <div class="row_chart">
                     <div id="chart_ec"></div>
                   </div>
                 </div>			
-                <ul class="actions">
-                  <li><a href="ec.php" class="button style3">More Details</a></li>
-                </ul>
 		      </section>
 			</div>
 			<div class="col-4 col-12-medium">
 			  <section class="highlight">
-			    <h3>Total Dissolved Solids</h3>
-                <p class="style4"> Recorded on <?php echo gmdate("l jS \of F Y", $sendTDS). " at ".gmdate("H:i:s", $sendTDS);?></p>
+  
                 <div class="container_chart">
                   <div class="row_chart">
                     <div id="chart_tds"></div>
                   </div>
                 </div>
-                <ul class="actions">
-                  <li><a href="tds.php" class="button style3">More Details</a></li>
-                </ul>
 		  	  </section>
             </div>
-            <div class="col-4 col-12-medium">
-			  <section class="highlight">
-                <h3>PH</h3>
-                <p class="style4"> Recorded on <?php echo $sendT;?></p>
+          </div>
+          <center>
+            <ul class="actions" >
+                <li><a href="tds_ec.php" class="button style3">More Details</a></li>
+            </ul>
+          </center>     
+        </div>
+      </section> 
+      <!-- Main -->
+      <section id="main" class="wrapper style4">
+        <div class="title">PH</div>
+        <div class="container">
+                <center>
+                  <center><p class="style4"> Recorded on <?php echo gmdate("l jS \of F Y", $sendPH). " at ".gmdate("H:i:s", $sendPH);?></p></center>
+                </center>  
 			    <div class="container_chart">
                   <div class="row_chart">
                     <div id="chart_ph"></div>
                   </div>
                 </div>
-                <ul class="actions">
-                  <li><a href="#" class="button style3">More Details</a></li>
-                </ul>
-			  </section>
-            </div>
-          </div>
+                <center>
+                  <ul class="actions">
+                    <li><a href="ph.php" class="button style3">More Details</a></li>
+                  </ul>
+			    </center>
         </div>
-      </section>
-      <!-- Main -->
-<!--  <section id="main" class="wrapper style2">
-        <div class="title">EC</div>
-        <div class="container">
-
-        </div>
-      </section> -->
-      <!-- Main -->
-<!--  <section id="main" class="wrapper style4">
-        <div class="title">PH</div>
-        <div class="container">
-
-        </div>
-      </section> -->        
+      </section>        
       <!-- Footer -->
       <section id="footer" class="wrapper">
         <div class="container">
@@ -260,7 +264,7 @@
 
         var dataPH = google.visualization.arrayToDataTable([
             ['Label', 'Value'],
-            ['pH', 7],
+            ['pH', <?php echo $ph;?>],
         ]);
           
         var w = $(window).width();
@@ -280,10 +284,10 @@
         };
 
          var optionsTDS = {
-            yellowFrom: 500, yellowTo: 650,
-            redFrom: 650, redTo: 1000,
-            minorTicks: 0,
-            max: 1000,
+            yellowFrom: 500, yellowTo: 550,
+            redFrom: 550, redTo: 650,
+            minorTicks: 10,
+            max: 650,
             height: y,
             width: x
         }; 
@@ -291,7 +295,7 @@
         var optionsEC = {
             yellowFrom: 900, yellowTo: 920,
             redFrom: 920, redTo: 1000,
-            minorTicks: 0,
+            minorTicks: 10,
             max: 1000,
             height: y,
             width: x

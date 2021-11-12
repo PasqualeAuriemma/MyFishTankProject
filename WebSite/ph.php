@@ -40,15 +40,13 @@
         </nav>-->
       </section>
       <!-- Temperatura -->
-      <section id="intro" class="wrapper style1">
-        <div class="title">Temperature</div>
+      <section id="tdsec" class="wrapper style4">
+        <div class="title">PH</div>
         <div class="container">
           <div class="row aln-center">
             <div class="col-6 col-12-medium">
               <section class="highlight">
-                 <p class="style2">
-                  Overview with charts
-              </p>
+                 <p class="style2"> Overview with charts </p>
               </section>
             </div>    
             <div class="col-6 col-12-medium">
@@ -61,14 +59,14 @@
                 </h3>  
                 <?php
                   $dataNow1 = date('Y-m-d');  
-                  $query4 = "SELECT data_send as date, temperature as temp FROM my_myfishtank.temp_tab WHERE FROM_UNIXTIME(data_send, '%Y-%m-%d') = '$dataNow1' ORDER BY data_send";
+                  $query4 = "SELECT data_send as date, ph FROM my_myfishtank.ph_tab WHERE FROM_UNIXTIME(data_send, '%Y-%m-%d') = '$dataNow1' ORDER BY data_send";
                   include("connection.php");
                   $result_list = $conn->query($query4);
                   $conn->close();
                   echo "<ol>";
                   if ($result_list->num_rows > 0) {
                     while($row4 = $result_list->fetch_assoc()) {
-                      echo "<li> At ".gmdate("H:i:s\ ", $row4['date'])."  Temperature = ".$row4['temp']."°</li>";
+                      echo "<li> At ".gmdate("H:i:s\ ", $row4['date'])."  EC = ".$row4['ph']."</li>";
                     }
                   }
                   echo '</ol>';
@@ -80,7 +78,7 @@
           
           <div id="areachart" style="margin: 0px 2px;"></div>
           <div id="buttonAreaChart">
-            <button3 id="change7D" class="buttonTrend">7 Days</button3>
+            <button4 id="change7D" class="buttonTrend">7 Days</button4>
             <button1 id="change1M" class="buttonTrend">1 Month</button1>
             <button2 id="change2M" class="buttonTrend">2 Months</button2>
             <button3 id="changeALL" class="buttonTrend">All</button3>
@@ -100,20 +98,6 @@
           </div>
         </div>
       </section>
-      <!-- Main -->
-<!--  <section id="main" class="wrapper style2">
-        <div class="title">EC</div>
-        <div class="container">
-
-        </div>
-      </section> -->
-      <!-- Main -->
-<!--  <section id="main" class="wrapper style4">
-        <div class="title">PH</div>
-        <div class="container">
-
-        </div>
-      </section> -->        
       <!-- Footer -->
       <section id="footer" class="wrapper">
         <div class="container">
@@ -170,10 +154,9 @@
 
         <?php // PHP Google Charts
         $dataNow = date('Y-m-d', strtotime("-1 month"));
-        $query4 = "SELECT AVG(temperature) as media FROM my_myfishtank.temp_tab WHERE FROM_UNIXTIME(data_send, '%Y-%m-%d') >= '$dataNow'";
-        $query2 = "SELECT temperature as temp, count(id) as count FROM my_myfishtank.temp_tab GROUP BY temperature";
-        $query1 = "SELECT data_arrive as date, temperature as temp FROM my_myfishtank.temp_tab WHERE FROM_UNIXTIME(data_send, '%Y-%m-%d') >= '$dataNow' ORDER BY data_send"; 
-        $query3 = "SELECT FROM_UNIXTIME(data_send, '%Y,%m -1 ,%d') as data, COUNT(data_send) as value FROM my_myfishtank.temp_tab WHERE FROM_UNIXTIME(data_send, '%Y') > '2000' GROUP BY FROM_UNIXTIME(data_send, '%Y-%m-%d')"; 
+        $query2 = "SELECT ph, count(id) as count FROM my_myfishtank.ph_tab GROUP BY ph";
+        $query1 = "SELECT data_arrive as date, ph FROM my_myfishtank.ph_tab WHERE FROM_UNIXTIME(data_send, '%Y-%m-%d') >= '$dataNow' ORDER BY data_send"; 
+        $query3 = "SELECT FROM_UNIXTIME(data_send, '%Y,%m -1 ,%d') as data, COUNT(data_send) as value FROM my_myfishtank.ph_tab GROUP BY FROM_UNIXTIME(data_send, '%Y-%m-%d')"; 
         ?> 
         drawPieAreaColumnCharts();
       }
@@ -185,7 +168,7 @@
       function drawPieAreaColumnCharts() {
 
         data_val = google.visualization.arrayToDataTable([
-          ['Date', 'Temp'],
+          ['Date', 'PH'],
           <?php // PHP Google Charts
           include("connection.php");
           $result1 = $conn->query($query1);
@@ -193,42 +176,31 @@
           if ($result1->num_rows > 0) {
             // output data of each row
             while($row1 = $result1->fetch_assoc()) {
-              echo "['".$row1['date']."',".$row1['temp']."],";
+              echo "['".$row1['date']."',".$row1['ph']."],";
             }
           }
           ?>
         ]);
-         <?php
-          $resultMedia = $conn->query($query4);
-          if ($resultMedia->num_rows > 0) {
-             // output data of each row
-             while($rowMedia = $resultMedia->fetch_assoc()) {
-               $media_temp = $rowMedia["media"];
-             }
-          } else {
-            $media_temp = 0;
-          }
-        $formatted_temperature = number_format($media_temp, 1);
-        echo "
+        
         var options_val = {  
           height: '1400px',
           width: '100px',
-          title: 'Temperature trend the average in 30 days is: $formatted_temperature',
+          title: 'PH trend',
           hAxis: {textPosition: 'none'},
           explorer: { maxZoomIn: .5 , maxZoomOut: 8 },
           backgroundColor: '#f1f8e9',
-          vAxis: {'title': 'Temperature', 'minValue': 22, 'maxValue': 35},
+          vAxis: {'title': 'PH', 'minValue': 0, 'maxValue': 12},
           chartArea:{
             top: 36,
-            left: 36,
+            left: 100,
             right: 18,
             bottom: 36
           },
-        };"; ?>
+        };
 
         var dataTable = new google.visualization.DataTable();
         dataTable.addColumn({ type: 'date', id: 'Date' });
-        dataTable.addColumn({ type: 'number', id: 'Won/Loss' });
+        dataTable.addColumn({ type: 'number', id: 'Recording' });
         dataTable.addRows([
           <?php // PHP Google Charts
 
@@ -238,47 +210,51 @@
           if ($result3->num_rows > 0) {
             // output data of each row
             while($row3 = $result3->fetch_assoc()) {
-
               echo "[new Date(".$row3['data']."),".$row3['value']."],";
             }
           }
 
           ?>]);
+          var options_val3 = {
+            width: '950',
+            title: "Number of daily measurements",
 
-
-        var options_val3 = {
-          width: '950',
-          title: "Number of daily measurements",
-
-          colorAxis: {minValue: 0,  colors: ['#FF0000', '#0903ab']},
-          calendar: {
-            dayOfWeekLabel: {
-              fontName: 'Times-Roman',
-              fontSize: 12,
-              color: 'white',
-              bold: false,
-              italic: false
-            }, 
-            monthLabel: {
-              fontName: 'Times-Roman',
-              fontSize: 12,
-              color: '#d5cbc3',
-              bold: true,
-              italic: true
-            },
-            underMonthSpace: 16,
-            daysOfWeek: 'SMTWTFS',
-          }
-        };
+            colorAxis: {minValue: 0,  colors: ['#FF0000', '#0903ab']},
+            calendar: {
+              yearLabel: {
+                fontName: 'Times-Roman',
+                fontSize: 32,
+                color: '#000000',
+                bold: true,
+                italic: true
+              },
+              dayOfWeekLabel: {
+                fontName: 'Times-Roman',
+                fontSize: 12,
+                color: '#000000',
+                bold: false,
+                italic: false
+              }, 
+              monthLabel: {
+                fontName: 'Times-Roman',
+                fontSize: 12,
+                color: '#2f21ce',
+                bold: true,
+                italic: true
+              },
+              underMonthSpace: 16,
+              daysOfWeek: 'SMTWTFS',
+            }
+        }
 
         data_val2 = google.visualization.arrayToDataTable([
-          ['Temperature', 'Count'],
+          ['PH', 'Count'],
           <?php 
           $result2 = $conn->query($query2);
           if ($result2->num_rows > 0) {
             // output data of each row
             while($row2 = $result2->fetch_assoc()) {
-              echo "['".$row2['temp']."',".$row2['count']."],";
+              echo "['".$row2['ph']."',".$row2['count']."],";
             }
           }
           ?>
@@ -288,7 +264,7 @@
           backgroundColor: 'transparent',
           is3D: true,
           chartArea:{left:'20%',top:0,width:'100%',height:'100%'},
-          legend: {textStyle: {color: 'white', fontSize: 14}}
+          legend: {textStyle: {color: 'black', fontSize: 14}}
         };
         var chart_val3 = new google.visualization.Calendar(document.getElementById('columnchart'));
         var chart_val2 = new google.visualization.PieChart(document.getElementById('piechart'));
@@ -305,6 +281,7 @@
 
         window.onload = resize();
         window.onresize = resize;
+        
         var button7D = document.getElementById('change7D');
         var button1M = document.getElementById('change1M');
         var button2M = document.getElementById('change2M');
@@ -313,16 +290,16 @@
         button7D.onclick = function () {
 
           data_val = google.visualization.arrayToDataTable([
-            ['Date', 'Temp'],
+            ['Date', 'PH'],
             <?php // PHP Google Charts
             $dataNow = date('Y-m-d', strtotime("-7 day"));
-            $query31 = "SELECT data_arrive as date, temperature as temp FROM my_myfishtank.temp_tab WHERE FROM_UNIXTIME(data_send, '%Y-%m-%d') >= '$dataNow' ORDER BY data_send";          
+            $query31 = "SELECT data_arrive as date, ph FROM my_myfishtank.ph_tab WHERE FROM_UNIXTIME(data_send, '%Y-%m-%d') >= '$dataNow' ORDER BY data_send";          
             
             $result31 = $conn->query($query31);
             if ($result31->num_rows > 0) {
               // output data of each row
               while($row31 = $result31->fetch_assoc()) {
-                echo "['".$row31['date']."',".$row31['temp']."],";
+                echo "['".$row31['date']."',".$row31['ph']."],";
               }
             }?>]);
 
@@ -330,20 +307,20 @@
           chart_val.draw(data_val, options_val);
 
         };
-        
+
         button2M.onclick = function () {
 
           data_val = google.visualization.arrayToDataTable([
-            ['Date', 'Temp'],
+            ['Date', 'PH'],
             <?php // PHP Google Charts
             $dataNow = date('Y-m-d', strtotime("-2 month"));
-            $query31 = "SELECT data_arrive as date, temperature as temp FROM my_myfishtank.temp_tab WHERE FROM_UNIXTIME(data_send, '%Y-%m-%d') >= '$dataNow' ORDER BY data_send";          
+            $query31 = "SELECT data_arrive as date, ph FROM my_myfishtank.ph_tab WHERE FROM_UNIXTIME(data_send, '%Y-%m-%d') >= '$dataNow' ORDER BY data_send";          
             
             $result31 = $conn->query($query31);
             if ($result31->num_rows > 0) {
               // output data of each row
               while($row31 = $result31->fetch_assoc()) {
-                echo "['".$row31['date']."',".$row31['temp']."],";
+                echo "['".$row31['date']."',".$row31['ph']."],";
               }
             }?>]);
 
@@ -355,16 +332,16 @@
         button1M.onclick = function () {
 
           data_val = google.visualization.arrayToDataTable([
-            ['Date', 'Temp'],
+            ['Date', 'EC'],
             <?php // PHP Google Charts
             $dataNow = date('Y-m-d', strtotime("-1 month"));
-            $query31 = "SELECT data_arrive as date, temperature as temp FROM my_myfishtank.temp_tab WHERE FROM_UNIXTIME(data_send, '%Y-%m-%d') >= '$dataNow' ORDER BY data_send";          
+            $query31 = "SELECT data_arrive as date, ph FROM my_myfishtank.ph_tab WHERE FROM_UNIXTIME(data_send, '%Y-%m-%d') >= '$dataNow' ORDER BY data_send";          
             $result31 = $conn->query($query31);
 
             if ($result31->num_rows > 0) {
               // output data of each row
               while($row31 = $result31->fetch_assoc()) {
-                echo "['".$row31['date']."',".$row31['temp']."],";
+                echo "['".$row31['date']."',".$row31['ph']."],";
               }
             }
             ?>
@@ -377,16 +354,16 @@
         buttonALL.onclick = function () {
 
           data_val = google.visualization.arrayToDataTable([
-            ['Date', 'Temp'],
+            ['Date', 'PH'],
             <?php // PHP Google Charts
 
-            $query31 = "SELECT data_arrive as date, temperature as temp FROM my_myfishtank.temp_tab ORDER BY data_send";          
+            $query31 = "SELECT data_arrive as date, ph FROM my_myfishtank.ph_tab ORDER BY data_send";          
             $result31 = $conn->query($query31);
 
             if ($result31->num_rows > 0) {
               // output data of each row
               while($row31 = $result31->fetch_assoc()) {
-                echo "['".$row31['date']."',".$row31['temp']."],";
+                echo "['".$row31['date']."',".$row31['ph']."],";
               }
             }
             ?>
