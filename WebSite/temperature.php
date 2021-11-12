@@ -1,4 +1,4 @@
-'.<!DOCTYPE HTML>
+<!DOCTYPE HTML>
 <!--
 	Escape Velocity by HTML5 UP
 	html5up.net | @ajlkn
@@ -9,7 +9,7 @@
     <title>PIA12 FISH TANK - AQUARIUM</title>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
-    <link rel="stylesheet" href="assets/css/main.css" />
+    <link rel="stylesheet" href="assets/css/main14.css" />
   </head>
   <body class="homepage is-preload">
     <div id="page-wrapper">
@@ -269,7 +269,7 @@
             underMonthSpace: 16,
             daysOfWeek: 'SMTWTFS',
           }
-        }
+        };
 
         data_val2 = google.visualization.arrayToDataTable([
           ['Temperature', 'Count'],

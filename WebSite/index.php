@@ -9,7 +9,7 @@
 		<title>PIA12 FISH TANK - AQUARIUM</title>
 		<meta charset="utf-8" />
 		<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
-		<link rel="stylesheet" href="assets/css/main10.css" />
+		<link rel="stylesheet" href="assets/css/main13.css" />
     <?php
       include("connection.php");
       if ($conn->connect_error) {
@@ -18,11 +18,13 @@
       $sqlT = "SELECT temperature, data_send as send FROM my_myfishtank.temp_tab ORDER BY data_send DESC limit 1";
       $sqlEC = "SELECT ec, data_send as send FROM my_myfishtank.ec_tab ORDER BY data_send DESC limit 1";
       $sqlTDS = "SELECT tds, data_send as send FROM my_myfishtank.tds_tab ORDER BY data_send DESC limit 1";
+      $sqlPH = "SELECT ph, data_send as send FROM my_myfishtank.ph_tab ORDER BY data_send DESC limit 1";
           
       $resultT = $conn->query($sqlT);
       $resultEC = $conn->query($sqlEC);
       $resultTDS = $conn->query($sqlTDS);
-     
+      $resultPH = $conn->query($sqlPH);
+      
       if ($resultT->num_rows > 0) {
         // output data of each row
         while($rowT = $resultT->fetch_assoc()) {
@@ -54,6 +56,17 @@
       } else {
         $tds = 0;
         $sendTDS = "no data";
+      }
+      
+       if ($resultPH->num_rows > 0) {
+        // output data of each row
+        while($rowPH = $resultPH->fetch_assoc()) {
+          $ph = $rowPH["ph"];
+          $sendPH = $rowPH["send"];
+        }
+      } else {
+        $ph = 0;
+        $sendPH = "no data";
       }
       
       $conn->close();
@@ -165,7 +178,7 @@
         <div class="title">PH</div>
         <div class="container">
                 <center>
-                  <p class="style4"> Recorded on <?php echo $sendT;?></p>
+                  <center><p class="style4"> Recorded on <?php echo gmdate("l jS \of F Y", $sendPH). " at ".gmdate("H:i:s", $sendPH);?></p></center>
                 </center>  
 			    <div class="container_chart">
                   <div class="row_chart">
@@ -174,7 +187,7 @@
                 </div>
                 <center>
                   <ul class="actions">
-                    <li><a href="#" class="button style3">More Details</a></li>
+                    <li><a href="ph.php" class="button style3">More Details</a></li>
                   </ul>
 			    </center>
         </div>
@@ -251,7 +264,7 @@
 
         var dataPH = google.visualization.arrayToDataTable([
             ['Label', 'Value'],
-            ['pH', 7],
+            ['pH', <?php echo $ph;?>],
         ]);
           
         var w = $(window).width();
