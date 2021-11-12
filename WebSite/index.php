@@ -9,7 +9,7 @@
 		<title>PIA12 FISH TANK - AQUARIUM</title>
 		<meta charset="utf-8" />
 		<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
-		<link rel="stylesheet" href="assets/css/main.css" />
+		<link rel="stylesheet" href="assets/css/main10.css" />
     <?php
       include("connection.php");
       if ($conn->connect_error) {
@@ -111,83 +111,74 @@
         </div>
       </section>
       <!-- DashBoard -->        
-      <section id="highlights" class="wrapper style3">
-        <div class="title">DashBoard</div>
+      <section id="highlights" class="wrapper style1">
+        <div class="title">Temperature</div>
         <div class="container">
-          <div class="row aln-center">
-            <div class="col-4 col-12-medium">
-              <section class="highlight">
-                <h3>Temperature</h3>
-                <p class="style4"> Recorded on <?php echo gmdate("l jS \of F Y", $sendT). " at ".gmdate("H:i:s", $sendT);?></p>
+                <center><p class="style4"> Recorded on <?php echo gmdate("l jS \of F Y", $sendT). " at ".gmdate("H:i:s", $sendT);?></p></center>
                 <div class="container_chart">
                   <div class="row_chart">        
 			        <div id="chart_temp"></div>
                   </div>
                 </div>    
-                <ul class="actions">
+                <center><ul class="actions">
                   <li><a href="temperature.php" class="button style3">More Details</a></li>
-                </ul>
-			  </section>
-			</div>
+                </ul></center>
+        </div>
+      </section>
+      <!-- Main -->
+      <section id="main" class="wrapper style5">
+        <div class="title">EC &amp TDS</div>
+        <div class="container">
+        <center>
+          <p class="style4"> Recorded on <?php echo gmdate("l jS \of F Y", $sendEC). " at ".gmdate("H:i:s", $sendEC);?></p>
+        </center>
+        <div class="row aln-center">
 			<div class="col-4 col-12-medium">
 			  <section class="highlight">
-                <h3>Conductivity</h3>
-                <p class="style4"> Recorded on <?php echo gmdate("l jS \of F Y", $sendEC). " at ".gmdate("H:i:s", $sendEC);?></p>
 			    <div class="container_chart">
                   <div class="row_chart">
                     <div id="chart_ec"></div>
                   </div>
                 </div>			
-                <ul class="actions">
-                  <li><a href="tds_ec.php" class="button style3">More Details</a></li>
-                </ul>
 		      </section>
 			</div>
 			<div class="col-4 col-12-medium">
 			  <section class="highlight">
-			    <h3>Total Dissolved Solids</h3>
-                <p class="style4"> Recorded on <?php echo gmdate("l jS \of F Y", $sendTDS). " at ".gmdate("H:i:s", $sendTDS);?></p>
+  
                 <div class="container_chart">
                   <div class="row_chart">
                     <div id="chart_tds"></div>
                   </div>
                 </div>
-                <ul class="actions">
-                  <li><a href="tds_ec.php" class="button style3">More Details</a></li>
-                </ul>
 		  	  </section>
             </div>
-            <div class="col-4 col-12-medium">
-			  <section class="highlight">
-                <h3>PH</h3>
-                <p class="style4"> Recorded on <?php echo $sendT;?></p>
+          </div>
+          <center>
+            <ul class="actions" >
+                <li><a href="tds_ec.php" class="button style3">More Details</a></li>
+            </ul>
+          </center>     
+        </div>
+      </section> 
+      <!-- Main -->
+      <section id="main" class="wrapper style4">
+        <div class="title">PH</div>
+        <div class="container">
+                <center>
+                  <p class="style4"> Recorded on <?php echo $sendT;?></p>
+                </center>  
 			    <div class="container_chart">
                   <div class="row_chart">
                     <div id="chart_ph"></div>
                   </div>
                 </div>
-                <ul class="actions">
-                  <li><a href="#" class="button style3">More Details</a></li>
-                </ul>
-			  </section>
-            </div>
-          </div>
+                <center>
+                  <ul class="actions">
+                    <li><a href="#" class="button style3">More Details</a></li>
+                  </ul>
+			    </center>
         </div>
-      </section>
-      <!-- Main -->
-<!--  <section id="main" class="wrapper style2">
-        <div class="title">EC</div>
-        <div class="container">
-
-        </div>
-      </section> -->
-      <!-- Main -->
-<!--  <section id="main" class="wrapper style4">
-        <div class="title">PH</div>
-        <div class="container">
-
-        </div>
-      </section> -->        
+      </section>        
       <!-- Footer -->
       <section id="footer" class="wrapper">
         <div class="container">
