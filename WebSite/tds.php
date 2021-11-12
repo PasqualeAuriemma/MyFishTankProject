@@ -5,7 +5,7 @@
     <title>PIA12 FISH TANK - AQUARIUM</title>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
-    <link rel="stylesheet" href="sito/assets/css/main8.css" />
+    <link rel="stylesheet" href="assets/css/main.css" />
   </head>
   <body class="homepage is-preload">
     <div id="page-wrapper">
@@ -77,21 +77,10 @@
           
           <div id="areachart" style="margin: 0px 2px;"></div>
           <div id="buttonAreaChart">
-            <button1 id="change1M" style="background-color: #e7e7e7; color: black;
-                                          text-align: center; text-decoration: none; width:25%;
-                                          display: inline-block; font-size: 14px;
-                                          border: 2px solid #555555; padding: 1px 1px 1px 1px;
-                                          margin: 4px 2px; cursor: pointer; float: left;">1 Month</button1>
-            <button2 id="change2M" style="background-color: #e7e7e7; color: black;
-                                          text-align: center; text-decoration: none;
-                                          display: inline-block; font-size: 14px; width:25%;
-                                          border: 2px solid #555555; padding: 1px 1px 1px 1px;
-                                          margin: 4px 2px; cursor: pointer; float: left;">2 Months</button2>
-            <button3 id="changeALL" style="background-color: #e7e7e7; color: black;
-                                           text-align: center; text-decoration: none;
-                                           display: inline-block; font-size: 14px; width:25%;
-                                           border: 2px solid #555555; padding: 1px 1px 1px 1px;
-                                           margin: 4px 2px; cursor: pointer; float: left;">All</button3>
+            <button4 id="change7d" class="buttonTrend">7 Days</button4>
+            <button1 id="change1M" class="buttonTrend">1 Month</button1>
+            <button2 id="change2M" class="buttonTrend">2 Months</button2>
+            <button3 id="changeALL" class="buttonTrend">All</button3>
           </div>
           <p style="clear:both"><br>
           <div class="row aln-center">
@@ -302,10 +291,32 @@
 
         window.onload = resize();
         window.onresize = resize;
-
+        
+        var button7D = document.getElementById('change7D');
         var button1M = document.getElementById('change1M');
         var button2M = document.getElementById('change2M');
         var buttonALL = document.getElementById('changeALL');
+        
+        button7D.onclick = function () {
+
+          data_val = google.visualization.arrayToDataTable([
+            ['Date', 'TDS'],
+            <?php // PHP Google Charts
+            $dataNow = date('Y-m-d', strtotime("-7 day"));
+            $query31 = "SELECT data_arrive as date, tds FROM my_myfishtank.tds_tab WHERE FROM_UNIXTIME(data_send, '%Y-%m-%d') >= '$dataNow' ORDER BY data_send";          
+            
+            $result31 = $conn->query($query31);
+            if ($result31->num_rows > 0) {
+              // output data of each row
+              while($row31 = $result31->fetch_assoc()) {
+                echo "['".$row31['date']."',".$row31['tds']."],";
+              }
+            }?>]);
+
+          chart_val.clearChart(); 
+          chart_val.draw(data_val, options_val);
+
+        };
 
         button2M.onclick = function () {
 

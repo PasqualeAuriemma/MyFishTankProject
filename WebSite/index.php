@@ -9,7 +9,7 @@
 		<title>PIA12 FISH TANK - AQUARIUM</title>
 		<meta charset="utf-8" />
 		<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
-		<link rel="stylesheet" href="sito/assets/css/main8.css" />
+		<link rel="stylesheet" href="assets/css/main.css" />
     <?php
       include("connection.php");
       if ($conn->connect_error) {
@@ -93,19 +93,19 @@
         <div class="container">
           <div class="carousel" data-flickity='{ "wrapAround": true, "autoPlay": true, "imagesLoaded":true }'>
               <div class="carousel-cell">
-                  <img class="w3-image" src="images\aquarium.jpg">
+                  <img class="w3-image" src="images\acquarium.jpg">
               </div>
               <div class="carousel-cell">
-                  <img class="w3-image" src="images\aquarium1.jpg">
+                  <img class="w3-image" src="images\acquarium1.jpg">
               </div>
               <div class="carousel-cell">
-                  <img class="w3-image" src="images\aquarium2.jpg">
+                  <img class="w3-image" src="images\acquarium2.jpg">
               </div>
               <div class="carousel-cell">
-                  <img class="w3-image" src="images\aquarium3.jpg">
+                  <img class="w3-image" src="images\acquarium3.jpg">
               </div>
               <div class="carousel-cell">
-                  <img class="w3-image" src="images\aquarium4.jpg">
+                  <img class="w3-image" src="images\acquarium4.jpg">
               </div>
           </div>
         </div>
@@ -139,7 +139,7 @@
                   </div>
                 </div>			
                 <ul class="actions">
-                  <li><a href="ec.php" class="button style3">More Details</a></li>
+                  <li><a href="tds_ec.php" class="button style3">More Details</a></li>
                 </ul>
 		      </section>
 			</div>
@@ -153,7 +153,7 @@
                   </div>
                 </div>
                 <ul class="actions">
-                  <li><a href="tds.php" class="button style3">More Details</a></li>
+                  <li><a href="tds_ec.php" class="button style3">More Details</a></li>
                 </ul>
 		  	  </section>
             </div>
@@ -280,10 +280,10 @@
         };
 
          var optionsTDS = {
-            yellowFrom: 500, yellowTo: 650,
-            redFrom: 650, redTo: 1000,
-            minorTicks: 0,
-            max: 1000,
+            yellowFrom: 500, yellowTo: 550,
+            redFrom: 550, redTo: 650,
+            minorTicks: 10,
+            max: 650,
             height: y,
             width: x
         }; 
@@ -291,7 +291,7 @@
         var optionsEC = {
             yellowFrom: 900, yellowTo: 920,
             redFrom: 920, redTo: 1000,
-            minorTicks: 0,
+            minorTicks: 10,
             max: 1000,
             height: y,
             width: x

@@ -1,4 +1,4 @@
-<!DOCTYPE HTML>
+'.<!DOCTYPE HTML>
 <!--
 	Escape Velocity by HTML5 UP
 	html5up.net | @ajlkn
@@ -9,7 +9,7 @@
     <title>PIA12 FISH TANK - AQUARIUM</title>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
-    <link rel="stylesheet" href="sito/assets/css/main8.css" />
+    <link rel="stylesheet" href="assets/css/main.css" />
   </head>
   <body class="homepage is-preload">
     <div id="page-wrapper">
@@ -80,21 +80,10 @@
           
           <div id="areachart" style="margin: 0px 2px;"></div>
           <div id="buttonAreaChart">
-            <button1 id="change1M" style="background-color: #e7e7e7; color: black;
-                                          text-align: center; text-decoration: none; width:25%;
-                                          display: inline-block; font-size: 14px;
-                                          border: 2px solid #555555; padding: 1px 1px 1px 1px;
-                                          margin: 4px 2px; cursor: pointer; float: left;">1 Month</button1>
-            <button2 id="change2M" style="background-color: #e7e7e7; color: black;
-                                          text-align: center; text-decoration: none;
-                                          display: inline-block; font-size: 14px; width:25%;
-                                          border: 2px solid #555555; padding: 1px 1px 1px 1px;
-                                          margin: 4px 2px; cursor: pointer; float: left;">2 Months</button2>
-            <button3 id="changeALL" style="background-color: #e7e7e7; color: black;
-                                           text-align: center; text-decoration: none;
-                                           display: inline-block; font-size: 14px; width:25%;
-                                           border: 2px solid #555555; padding: 1px 1px 1px 1px;
-                                           margin: 4px 2px; cursor: pointer; float: left;">All</button3>
+            <button3 id="change7D" class="buttonTrend">7 Days</button3>
+            <button1 id="change1M" class="buttonTrend">1 Month</button1>
+            <button2 id="change2M" class="buttonTrend">2 Months</button2>
+            <button3 id="changeALL" class="buttonTrend">All</button3>
           </div>
           <p style="clear:both"><br>
           <div class="row aln-center">
@@ -181,6 +170,7 @@
 
         <?php // PHP Google Charts
         $dataNow = date('Y-m-d', strtotime("-1 month"));
+        $query4 = "SELECT AVG(temperature) as media FROM my_myfishtank.temp_tab WHERE FROM_UNIXTIME(data_send, '%Y-%m-%d') >= '$dataNow'";
         $query2 = "SELECT temperature as temp, count(id) as count FROM my_myfishtank.temp_tab GROUP BY temperature";
         $query1 = "SELECT data_arrive as date, temperature as temp FROM my_myfishtank.temp_tab WHERE FROM_UNIXTIME(data_send, '%Y-%m-%d') >= '$dataNow' ORDER BY data_send"; 
         $query3 = "SELECT FROM_UNIXTIME(data_send, '%Y,%m -1 ,%d') as data, COUNT(data_send) as value FROM my_myfishtank.temp_tab WHERE FROM_UNIXTIME(data_send, '%Y') > '2000' GROUP BY FROM_UNIXTIME(data_send, '%Y-%m-%d')"; 
@@ -208,10 +198,22 @@
           }
           ?>
         ]);
+         <?php
+          $resultMedia = $conn->query($query4);
+          if ($resultMedia->num_rows > 0) {
+             // output data of each row
+             while($rowMedia = $resultMedia->fetch_assoc()) {
+               $media_temp = $rowMedia["media"];
+             }
+          } else {
+            $media_temp = 0;
+          }
+        $formatted_temperature = number_format($media_temp, 1);
+        echo "
         var options_val = {  
           height: '1400px',
           width: '100px',
-          title: 'Temperature trend',
+          title: 'Temperature trend the average in 30 days is: $formatted_temperature',
           hAxis: {textPosition: 'none'},
           explorer: { maxZoomIn: .5 , maxZoomOut: 8 },
           backgroundColor: '#f1f8e9',
@@ -222,7 +224,7 @@
             right: 18,
             bottom: 36
           },
-        };
+        };"; ?>
 
         var dataTable = new google.visualization.DataTable();
         dataTable.addColumn({ type: 'date', id: 'Date' });
@@ -303,11 +305,32 @@
 
         window.onload = resize();
         window.onresize = resize;
-
+        var button7D = document.getElementById('change7D');
         var button1M = document.getElementById('change1M');
         var button2M = document.getElementById('change2M');
         var buttonALL = document.getElementById('changeALL');
+        
+        button7D.onclick = function () {
 
+          data_val = google.visualization.arrayToDataTable([
+            ['Date', 'Temp'],
+            <?php // PHP Google Charts
+            $dataNow = date('Y-m-d', strtotime("-7 day"));
+            $query31 = "SELECT data_arrive as date, temperature as temp FROM my_myfishtank.temp_tab WHERE FROM_UNIXTIME(data_send, '%Y-%m-%d') >= '$dataNow' ORDER BY data_send";          
+            
+            $result31 = $conn->query($query31);
+            if ($result31->num_rows > 0) {
+              // output data of each row
+              while($row31 = $result31->fetch_assoc()) {
+                echo "['".$row31['date']."',".$row31['temp']."],";
+              }
+            }?>]);
+
+          chart_val.clearChart(); 
+          chart_val.draw(data_val, options_val);
+
+        };
+        
         button2M.onclick = function () {
 
           data_val = google.visualization.arrayToDataTable([
