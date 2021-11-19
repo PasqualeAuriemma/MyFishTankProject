@@ -22,3 +22,15 @@ ph_tab
 2	ph      	float			No	               Nessuno		
 3   data_send	text	        utf8mb4_0900_ai_ci		                Sì	NULL		
 4	data_arrive	timestamp		No	               CURRENT_TIMESTAMP	DEFAULT_GENERATED
+
+Board: 
+Mega 2560 + ESP8266 
+
+Moduli: 
+DS18B20
+LiquidCrystal + I2C 2*16
+RTC_DS1307
+TDS Meter v 1.0 KS0429
+Micro-SD Memory Card Adapter for Arduino with 3.3V-5V
+Modulo Rele Relay Relevador 8 Canales 5v
+AD Analog Keyboard
