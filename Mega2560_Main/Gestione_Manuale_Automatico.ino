@@ -119,9 +119,9 @@ void onAutomaticProcess() {
   config.onOffPhSending = true;
   //Turning on Fish Feeder and Filter
   manageReleSymbolAndAction(4, 0);
-  delay(500);
+  delay(2000);
   manageReleSymbolAndAction(1, 0);
-  delay(500);
+  delay(2000);
 }
 
 //
@@ -137,24 +137,24 @@ void offAutomaticProcess() {
   //Turning off Fish Feeder, Filter, Termometer, Ossigeno and turning on Lights
   if (releSymbol[0] == 0) {
     manageReleSymbolAndAction(0, 0);
-    delay(500);
   }
+  delay(2000);
   if (releSymbol[1] == 1) {
     manageReleSymbolAndAction(1, 1);
-    delay(500);
   }
+  delay(2000);
   if (releSymbol[2] == 1) {
     manageReleSymbolAndAction(2, 1);
-    delay(500);
   }
+  delay(2000);
   if (releSymbol[3] == 1) {
     manageReleSymbolAndAction(3, 1);
-    delay(500);
   }
+  delay(2000);
   if (releSymbol[4] == 1) {
     manageReleSymbolAndAction(4, 1);
-    delay(500);
   }
+  delay(2000);
   //for(int i=0; i<numRele; i++){
   //  Serial.println(releSymbol[i]);
   //}

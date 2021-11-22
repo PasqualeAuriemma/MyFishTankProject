@@ -7,7 +7,8 @@ int getKeyValue()
 {
   int val = 0;
   val = analogRead(keypadPin);
-  if (val > 7 && val < 880) {
+  
+  if (val > 7 && val < 975) {
     if (val > 7 && val < 130) { //left
       return code[1];
     } else if (val > 131 && val < 315) { //down

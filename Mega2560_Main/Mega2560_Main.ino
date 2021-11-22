@@ -19,7 +19,7 @@
 /***************************************************************/
 
 #define TdsSensorPin A1
-#define VREF 4.59 // analog reference voltage(Volt) of the ADC
+#define VREF 4.54 // analog reference voltage(Volt) of the ADC
 #define SCOUNT 30 // sum of sample point
 // All of the backpacks like the one shown are at 0x27.
 #define I2C_ADDR   0x27 // <--Change to match your display. Use scanner.ino to find address.
