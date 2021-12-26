@@ -24,12 +24,12 @@ void initScreen() {
 // LCD screen with time and temperature
 void mainScreen() {
   lcd.setCursor(0, 0); lcd.print(buffer);
-  lcd.setCursor (5, 1); lcd.print(int(tds));
-  lcd.setCursor (8, 1); lcd.print("ppm");
-  lcd.setCursor (11, 1); lcd.print(" ");
-  lcd.setCursor (12, 1); lcd.print(temperature);
-  lcd.setCursor (14, 1); lcd.write(byte(2));
-  lcd.setCursor (15, 1); lcd.print(" ");
+  lcd.setCursor (4, 1); lcd.print(int(tds));
+  lcd.setCursor (7, 1); lcd.print("uS/cm");
+  lcd.setCursor (12, 1); lcd.print(" ");
+  lcd.setCursor (13, 1); lcd.print(temperature);
+  lcd.setCursor (15, 1); lcd.write(byte(2));
+ 
 }
 
 //Showing Menu
@@ -859,10 +859,25 @@ int manageMenuRangeNumberCursors(int keyPad, int row, int number, int minItem, i
 void saveTime(byte *oraEMin) {
   waitingActionMenu();
   char timeBuffer[8];
+  char timeBufferSub[8];
+  char dateBuffer[11];
   sprintf(timeBuffer, "%02d:%02d:00", oraEMinTimeClockTemp[0], oraEMinTimeClockTemp[1]);
-  //  Serial.println("Time buffer: " + String(timeBuffer));
-  RTC.adjust(DateTime(__DATE__, timeBuffer));
+  sprintf(dateBuffer, "%s %02d %04d",  monthName(RTC.now().month()), RTC.now().day(), RTC.now().year());
+  substring(timeBuffer, timeBufferSub, 1,8);
+  //Serial.print("Time buffer: "+String(dateBuffer)+ " "+String(timeBufferSub));
+  RTC.adjust(DateTime(dateBuffer, timeBufferSub));
   exitFromMenu();
+}
+
+// C substring function definition
+void substring(char s[], char sub[], int p, int l) {
+   int c = 0;
+   
+   while (c < l) {
+      sub[c] = s[p+c-1];
+      c++;
+   }
+   sub[c] = '\0';
 }
 
 short _get_max_day(short month, int year) {
@@ -882,8 +897,6 @@ short _get_max_day(short month, int year) {
     return 28;
   }
 }
-
-enum monthw { January = 1, February, March, April, May, June, July, August, September, October, November, December };
 
 const char *monthName(int m) {
   switch (m) {
@@ -906,9 +919,13 @@ const char *monthName(int m) {
 void saveDate(int *date) {
   waitingActionMenu();
   char dateBuffer[11];
+  char timeBuffer[8];
+  char timeBufferSub[8];
+  sprintf(timeBuffer, "%02d:%02d:00", RTC.now().hour(), RTC.now().minute());
   sprintf(dateBuffer, "%s %02d %04d",  monthName(date[1]), date[0], date[2]);
-  //Serial.println("Date buffer: " + String(dateBuffer));
-  RTC.adjust(DateTime(dateBuffer, __TIME__));
+  substring(timeBuffer, timeBufferSub, 1,8);
+  //Serial.println("Date buffer: " + String(dateBuffer) + " " + String(timeBuffer));
+  RTC.adjust(DateTime(dateBuffer, timeBufferSub));
   exitFromMenu();
 }
 
