@@ -7,10 +7,23 @@
 <html>
   <head>
     <title>PIA12 FISH TANK - AQUARIUM</title>
+    <link rel="icon" type="image/png" href="/images/salmon.png">
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
     <link rel="stylesheet" href="assets/css/main14.css" />
-  </head>
+    <link rel="stylesheet" href="//code.jquery.com/ui/1.13.0/themes/base/jquery-ui.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+     <style type="text/css" media="screen">
+      .outer {
+              width: 100%;  
+              }
+      .outer > * {
+        display:inline-block;
+        vertical-align:middle;
+      
+      }
+    </style>
+ </head>
   <body class="homepage is-preload">
     <div id="page-wrapper">
       <!-- Header -->
@@ -46,31 +59,49 @@
           <div class="row aln-center">
             <div class="col-6 col-12-medium">
               <section class="highlight">
-                 <p class="style2"> Overview with charts </p>
+                 <p class="style2"> Overview with charts
+                  <a href="#!" data-id="" data-bs-toggle="modal" data-bs-target="#addPHModal"   class="btn btn-success btn-sm" >Add PH Value</a>
+                 </p>
               </section>
             </div>    
             <div class="col-6 col-12-medium">
               <section class="highlight"> 
                 <div style="width: 100%; height: 100%;">
-                <h3><?php
-                      $dataNow1 = date('Y-m-d');
-                      echo "On $dataNow1 arrived:";
+                  <?php
+                    $dataNow1 = date('Y-m-d'); 
+                  ?>
+                  <div class="col-md-3" style="width: 100%;">
+                    <div class = "outer">   
+                      <div> <h1> On </h1> </div> 
+                      <div> <input type="text" name="from_date" id="from_date" class="form-control"  size="7" placeholder="<?php echo "$dataNow1" ?>" /> </div> 
+                      <div> <h1> arrived: </h1> </div>
+                      <div> <input type="button" name="filter" id="filter" value="Filter" class="btn btn-info"  style=" border: 0;
+                          line-height: 2.5; font-size: 1rem; text-align: center; color: #fff;
+                          text-shadow: 1px 1px 1px #000; border-radius: 10px; background-color: rgba(220, 0, 0, 1);
+                          background-image: linear-gradient(to top left, rgba(0, 0, 0, .2), rgba(0, 0, 0, .2) 30%,
+                          rgba(0, 0, 0, 0)); box-shadow: inset 2px 2px 3px rgba(255, 255, 255, .6),
+                          inset -2px -2px 3px rgba(0, 0, 0, .6);" /> </div>
+                      
+                    </div>   
+                  </div> 
+                  <?php
+                    $dataNow1 = date('Y-m-d');  
+                    $query4 = "SELECT data_send as date, ph FROM my_myfishtank.ph_tab WHERE FROM_UNIXTIME(data_send, '%Y-%m-%d') = '$dataNow1' ORDER BY data_send";
+                    include("connection.php");
+                    $result_list = $con->query($query4);
+                    $con->close();
+                  ?>
+                  <div id="list1">  
+                    <?php
+                      echo "<ol>";
+                      if ($result_list->num_rows > 0) {
+                        while($row4 = $result_list->fetch_assoc()) {
+                          echo "<li style='color:black;'> At ".gmdate("H:i:s\ ", $row4['date'])."  PH = ".$row4['ph']."</li>";
+                        }
+                      }
+                      echo '</ol>';
                     ?>
-                </h3>  
-                <?php
-                  $dataNow1 = date('Y-m-d');  
-                  $query4 = "SELECT data_send as date, ph FROM my_myfishtank.ph_tab WHERE FROM_UNIXTIME(data_send, '%Y-%m-%d') = '$dataNow1' ORDER BY data_send";
-                  include("connection.php");
-                  $result_list = $conn->query($query4);
-                  $conn->close();
-                  echo "<ol>";
-                  if ($result_list->num_rows > 0) {
-                    while($row4 = $result_list->fetch_assoc()) {
-                      echo "<li> At ".gmdate("H:i:s\ ", $row4['date'])."  EC = ".$row4['ph']."</li>";
-                    }
-                  }
-                  echo '</ol>';
-                ?>
+                  </div> 
                 </div>
               </section>
             </div>
@@ -112,7 +143,7 @@
                       <p>
                         <a href="https://github.com/PasqualeAuriemma/MyFishTankProject">Github</a><br />
                         <a href="https://www.linkedin.com/in/pasquale-auriemma-780953b8/">LinkedIn</a><br />
-                        <a href="#">Untitled</a>
+                        <a href="https://it.altervista.org/">Altervista</a>
                       </p>
                     </section>
                   </div>
@@ -139,12 +170,71 @@
     <!-- Scripts -->
     <script src="sito/assets/js/jquery.min.js"></script>
     <script src="sito/assets/js/jquery.dropotron.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.js"></script>
+    <script src="https://code.jquery.com/ui/1.13.0/jquery-ui.js"></script>
     <script src="sito/assets/js/browser.min.js"></script>
     <script src="sito/assets/js/breakpoints.min.js"></script>
     <script src="sito/assets/js/util.js"></script>
     <!-- <script src="sito/assets/js/main.js"></script> -->
     <!-- oppure <script src="https://unpkg.com/flickity@2/dist/flickity.pkgd.min.js"></script> -->
     <script src="sito/assets\js\flickity.pkgd.min.js"></script>
+    <link href="css/bootstrap5.0.1.min.css" rel="stylesheet"  crossorigin="anonymous">        
+    <script src="js/bootstrap.bundle.min.js" crossorigin="anonymous"></script>       
+    <script type="text/javascript">
+    $(document).on('submit','#addPH',function(e){
+      			e.preventDefault();
+                var key= $('#addKeyField').val();
+                var ph= $('#addPHField').val();
+                if (key == "Pia12"){
+                       $.ajax({
+                         url:"add_ph.php",
+                         type:"post",
+                         data:{ph:ph},
+                         success:function(data){
+                           var json = JSON.parse(data);
+                           var status = json.status;
+                           if(status=='true'){
+                            $('#addPHModal').modal('hide');
+                            var frm = document.getElementsByName('addPH')[0];
+                            frm.reset();  // Reset all form data
+                            setInterval('location.reload(true)', 1000);
+                           }else{
+                            alert('failed');
+                           }
+                         }
+                      });
+    			}else{
+      				alert('Key wrong');
+    			}
+  			});
+    </script>  
+    <script>  
+      $(document).ready(function(){  
+           $.datepicker.setDefaults({  
+                dateFormat: 'yy-mm-dd'   
+           });  
+           $(function(){  
+                $("#from_date").datepicker();   
+           });  
+           $('#filter').click(function(){  
+                var selected_date = $('#from_date').val();   
+                if(selected_date != '')  
+                {  
+                     $.ajax({  
+                          url:"filter_ph.php",  
+                          method:"POST",   
+                          data:{date:selected_date},  
+                          success:function(data)  
+                          {   
+                             $('#list1').html(data);  
+                          }  
+                     });  
+                } else {  
+                   alert("Please Select Date");  
+                }  
+           });  
+      });  
+    </script>  
     <script type="text/javascript" src="https://www.google.com/jsapi"></script>
     <script type="text/javascript">
       google.load('visualization', '1', {packages: ['corechart', 'bar', "calendar"]});
@@ -171,12 +261,12 @@
           ['Date', 'PH'],
           <?php // PHP Google Charts
           include("connection.php");
-          $result1 = $conn->query($query1);
+          $result1 = $con->query($query1);
 
           if ($result1->num_rows > 0) {
             // output data of each row
             while($row1 = $result1->fetch_assoc()) {
-              echo "['".$row1['date']."',".$row1['ph']."],";
+              echo "['".$row1['date']."',".round($row1['ph'], 1)."],";
             }
           }
           ?>
@@ -189,7 +279,7 @@
           hAxis: {textPosition: 'none'},
           explorer: { maxZoomIn: .5 , maxZoomOut: 8 },
           backgroundColor: '#f1f8e9',
-          vAxis: {'title': 'PH', 'minValue': 0, 'maxValue': 12},
+          vAxis: {'title': 'PH', 'minValue': 6, 'maxValue': 8},
           chartArea:{
             top: 36,
             left: 100,
@@ -205,7 +295,7 @@
           <?php // PHP Google Charts
 
 
-          $result3 = $conn->query($query3);
+          $result3 = $con->query($query3);
 
           if ($result3->num_rows > 0) {
             // output data of each row
@@ -250,11 +340,11 @@
         data_val2 = google.visualization.arrayToDataTable([
           ['PH', 'Count'],
           <?php 
-          $result2 = $conn->query($query2);
+          $result2 = $con->query($query2);
           if ($result2->num_rows > 0) {
             // output data of each row
             while($row2 = $result2->fetch_assoc()) {
-              echo "['".$row2['ph']."',".$row2['count']."],";
+              echo "['".round($row2['ph'], 1)."',".$row2['count']."],";
             }
           }
           ?>
@@ -295,11 +385,11 @@
             $dataNow = date('Y-m-d', strtotime("-7 day"));
             $query31 = "SELECT data_arrive as date, ph FROM my_myfishtank.ph_tab WHERE FROM_UNIXTIME(data_send, '%Y-%m-%d') >= '$dataNow' ORDER BY data_send";          
             
-            $result31 = $conn->query($query31);
+            $result31 = $con->query($query31);
             if ($result31->num_rows > 0) {
               // output data of each row
               while($row31 = $result31->fetch_assoc()) {
-                echo "['".$row31['date']."',".$row31['ph']."],";
+                echo "['".$row31['date']."',".round($row31['ph'], 1)."],";
               }
             }?>]);
 
@@ -316,11 +406,11 @@
             $dataNow = date('Y-m-d', strtotime("-2 month"));
             $query31 = "SELECT data_arrive as date, ph FROM my_myfishtank.ph_tab WHERE FROM_UNIXTIME(data_send, '%Y-%m-%d') >= '$dataNow' ORDER BY data_send";          
             
-            $result31 = $conn->query($query31);
+            $result31 = $con->query($query31);
             if ($result31->num_rows > 0) {
               // output data of each row
               while($row31 = $result31->fetch_assoc()) {
-                echo "['".$row31['date']."',".$row31['ph']."],";
+                echo "['".$row31['date']."',".round($row31['ph'], 1)."],";
               }
             }?>]);
 
@@ -332,16 +422,16 @@
         button1M.onclick = function () {
 
           data_val = google.visualization.arrayToDataTable([
-            ['Date', 'EC'],
+            ['Date', 'PH'],
             <?php // PHP Google Charts
             $dataNow = date('Y-m-d', strtotime("-1 month"));
             $query31 = "SELECT data_arrive as date, ph FROM my_myfishtank.ph_tab WHERE FROM_UNIXTIME(data_send, '%Y-%m-%d') >= '$dataNow' ORDER BY data_send";          
-            $result31 = $conn->query($query31);
+            $result31 = $con->query($query31);
 
             if ($result31->num_rows > 0) {
               // output data of each row
               while($row31 = $result31->fetch_assoc()) {
-                echo "['".$row31['date']."',".$row31['ph']."],";
+                echo "['".$row31['date']."',".round($row31['ph'], 1)."],";
               }
             }
             ?>
@@ -358,12 +448,12 @@
             <?php // PHP Google Charts
 
             $query31 = "SELECT data_arrive as date, ph FROM my_myfishtank.ph_tab ORDER BY data_send";          
-            $result31 = $conn->query($query31);
+            $result31 = $con->query($query31);
 
             if ($result31->num_rows > 0) {
               // output data of each row
               while($row31 = $result31->fetch_assoc()) {
-                echo "['".$row31['date']."',".$row31['ph']."],";
+                echo "['".$row31['date']."',".round($row31['ph'], 1)."],";
               }
             }
             ?>
@@ -375,7 +465,40 @@
       }
     </script>
     <?php      
-    $conn->close();
+    $con->close();
     ?>
+        <!-- Add PH Modal -->
+    	<div class="modal fade" id="addPHModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  			<div class="modal-dialog">
+    			<div class="modal-content">
+      				<div class="modal-header">
+        				<h5 class="modal-title" id="exampleModalLabel">Add PH value</h5>
+        				<button7 type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button7>
+      				</div>
+      				<div class="modal-body">
+        				<form id="addPH" name="addPH" action="">
+             				<div class="mb-3 row">
+            					<label for="addKeyField" class="col-md-3 form-label">Key</label>
+            					<div class="col-md-9">
+              						<input type="password" class="form-control" id="addKeyField" name="key" >
+            					</div>
+          					</div>
+          					<div class="mb-3 row">
+            					<label for="addPHField" class="col-md-3 form-label">PH</label>
+            					<div class="col-md-9">
+              						<input type="number" step="any" class="form-control" id="addPHField" name="ph" >
+            					</div>
+          					</div>
+          					<div class="text-center">
+            					<button type="submit" class="btn btn-primary">Submit</button>
+          					</div>
+        				</form> 
+      				</div>
+     				<div class="modal-footer">
+        				<!--<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>-->
+      				</div>
+    			</div>
+  			</div>
+		</div>  
   </body>
 </html>

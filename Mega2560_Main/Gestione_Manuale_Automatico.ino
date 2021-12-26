@@ -14,6 +14,7 @@ void sendValueToWeb(float value, String key, DateTime now) {
   String payload = "";
   String fileName = key + "_v.jso";
   saveValue(fileName, value, timeStamp, key);
+  
   payload += key;
   payload += "=";
   payload += value;
@@ -21,7 +22,7 @@ void sendValueToWeb(float value, String key, DateTime now) {
   payload += "Date=";
   payload +=  timeStamp;
   payload += ";";
-  //Serial.println(payload);
+  Serial.println(payload);
   Serial3.println(payload);
 }
 
@@ -109,14 +110,14 @@ void manageSendingSettings(int item, int colItem) {
 
 //
 void onAutomaticProcess() {
-  config.onOffLightAuto = true;
-  config.onOffHeater = true;
-  config.onOffTDS = true;
-  config.onOffPH = true;
-  config.onOffTemperature = true;
-  config.onOffTemperatureSending = true;
-  config.onOffTDSSending = true;
-  config.onOffPhSending = true;
+  if(onOffLightAuto){config.onOffLightAuto = true;}
+  if(onOffHeater){config.onOffHeater = true;}
+  if(onOffTDS){config.onOffTDS = true;}
+  if(onOffPH){config.onOffPH = true;}
+  if(onOffTemperature){config.onOffTemperature = true;}
+  if(onOffTemperatureSending){config.onOffTemperatureSending = true;}
+  if(onOffTDSSending){config.onOffTDSSending = true;}
+  if(onOffPhSending){config.onOffPhSending = true;}
   //Turning on Fish Feeder and Filter
   manageReleSymbolAndAction(4, 0);
   delay(2000);

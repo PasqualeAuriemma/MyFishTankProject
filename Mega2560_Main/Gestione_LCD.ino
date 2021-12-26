@@ -24,12 +24,12 @@ void initScreen() {
 // LCD screen with time and temperature
 void mainScreen() {
   lcd.setCursor(0, 0); lcd.print(buffer);
-  lcd.setCursor (5, 1); lcd.print(int(tds));
-  lcd.setCursor (8, 1); lcd.print("ppm");
-  lcd.setCursor (11, 1); lcd.print(" ");
-  lcd.setCursor (12, 1); lcd.print(temperature);
-  lcd.setCursor (14, 1); lcd.write(byte(2));
-  lcd.setCursor (15, 1); lcd.print(" ");
+  lcd.setCursor (4, 1); lcd.print(int(tds));
+  lcd.setCursor (7, 1); lcd.print("uS/cm");
+  lcd.setCursor (12, 1); lcd.print(" ");
+  lcd.setCursor (13, 1); lcd.print(temperature);
+  lcd.setCursor (15, 1); lcd.write(byte(2));
+ 
 }
 
 //Showing Menu
