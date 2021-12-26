@@ -6,11 +6,10 @@
     <link rel="icon" type="image/png" href="/images/salmon.png">
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
-    <link rel="stylesheet" href="assets/css/main14.css" />
     <link rel="stylesheet" href="//code.jquery.com/ui/1.13.0/themes/base/jquery-ui.css">
-
-    <link href="css/bootstrap5.0.1.min.css" rel="stylesheet"  crossorigin="anonymous">        
-    <script src="js/bootstrap.bundle.min.js"  crossorigin="anonymous"></script>        
+    <link rel="stylesheet" href="assets/css/main14.css" />
+    <link href="assets/css/bootstrap5.0.1.min.css" rel="stylesheet"  crossorigin="anonymous">        
+    <script src="assets/js/bootstrap.bundle.min.js"  crossorigin="anonymous"></script>        
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     <style type="text/css" media="screen">
       .outer {

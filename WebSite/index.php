@@ -10,10 +10,10 @@
         <link rel="icon" type="image/png" href="/images/salmon.png">
 		<meta charset="utf-8" />
 		<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
-		<link rel="stylesheet" href="assets/css/main14.css" />
+		
         <link href="assets/css/bootstrap5.0.1.min.css" rel="stylesheet"  crossorigin="anonymous">
         <link rel="stylesheet" type="text/css" href="assets/css/datatables-1.10.25.min.css"/>
-        
+        <link rel="stylesheet" href="assets/css/main14.css" />
         <style type="text/css">
            .btnAdd {
            text-align: right;
@@ -580,13 +580,13 @@
         </script>
     	<!-- Scripts 
     	<script src="sito/assets/js/jquery.min.js"></script>-->
-        <script src="sito/assets/js/jquery.dropotron.min.js"></script>
-        <script src="sito/assets/js/browser.min.js"></script>
-        <script src="sito/assets/js/breakpoints.min.js"></script>
-        <script src="sito/assets/js/util.js"></script>
+        <script src="assets/js/jquery.dropotron.min.js"></script>
+        <script src="assets/js/browser.min.js"></script>
+        <script src="assets/js/breakpoints.min.js"></script>
+        <script src="assets/js/util.js"></script>
         <!-- <script src="sito/assets/js/main.js"></script> -->
         <!-- oppure <script src="https://unpkg.com/flickity@2/dist/flickity.pkgd.min.js"></script> -->
-        <script src="sito/assets\js\flickity.pkgd.min.js"></script>
+        <script src="assets/js/flickity.pkgd.min.js"></script>
         <script type="text/javascript" src="https://www.google.com/jsapi"></script>
         <script type="text/javascript">
           google.load('visualization', '1', {packages: ['corechart', 'gauge']});
