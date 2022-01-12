@@ -14,6 +14,7 @@ if(isset($_POST['search']['value']))
 	$sql .= " OR no3 like '%".$search_value."%'";
 	$sql .= " OR gh like '%".$search_value."%'";
     $sql .= " OR kh like '%".$search_value."%'";
+    $sql .= " OR po4 like '%".$search_value."%'";
 }
 
 if(isset($_POST['order']))
@@ -45,7 +46,8 @@ while($row = mysqli_fetch_assoc($query))
 	$sub_array[] = $row['no2'];
 	$sub_array[] = $row['no3'];
 	$sub_array[] = $row['gh'];
-    $sub_array[] = $row['kh'];;
+    $sub_array[] = $row['kh'];
+    $sub_array[] = $row['po4'];
 	$sub_array[] = '<a href="javascript:void();" data-id="'.$row['id'].'"  class="btn btn-info btn-sm editbtn" >Edit</a>  <a href="javascript:void();" data-id="'.$row['id'].'"  class="btn btn-danger btn-sm deleteBtn" >Delete</a>';
 	$data[] = $sub_array;
 }

@@ -10,16 +10,12 @@
         <link rel="icon" type="image/png" href="/images/salmon.png">
 		<meta charset="utf-8" />
 		<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
-		
+		<link rel="stylesheet" href="assets/css/main14.css" />
         <link href="assets/css/bootstrap5.0.1.min.css" rel="stylesheet"  crossorigin="anonymous">
         <link rel="stylesheet" type="text/css" href="assets/css/datatables-1.10.25.min.css"/>
-        <link rel="stylesheet" href="assets/css/main14.css" />
+        
         <style type="text/css">
-           .btnAdd {
-           text-align: right;
-           width: auto;
-           margin-bottom: 20px;
-           }
+           
            div.dataTables_wrapper {
               width: 100%;
               margin: 0 auto;
@@ -132,10 +128,10 @@
                           <img class="w3-image" src="images\acquarium2.jpg">
                       </div>
                       <div class="carousel-cell">
-                          <img class="w3-image" src="images\acquarium3.jpg">
+                          <img class="w3-image" src="images\acquarium4.jpg">
                       </div>
                       <div class="carousel-cell">
-                          <img class="w3-image" src="images\acquarium4.jpg">
+                          <img class="w3-image" src="images\riallestimento0.jpg">
                       </div>
                   </div>
               </div>
@@ -191,9 +187,7 @@
           	<section id="main" class="wrapper style5">
 			  <div class="title">Water Values</div>
               <div class="container">
-                <left>  
-              		<a href="#!" data-id="" data-bs-toggle="modal" data-bs-target="#addWVModal"   class="btn btn-success btn-sm" >Add Values</a>
-               	</left>  
+        
                 <table id="waterValuesTable" class="table" style="width:100%">
                    	<thead>
                        	<th>Data</th>
@@ -201,20 +195,21 @@
                         <th>Nitrati</th>
                         <th>GH</th>
                         <th>KH</th>
+                        <th>Fosfati</th>
                         <th>Options</th>
 					</thead>
 					<tbody>
 					</tbody>
 				</table>
+                <left>  
+              		<a href="#!" data-id="" data-bs-toggle="modal" data-bs-target="#addWVModal" class="btn btn-success btn-sm" >Add Values</a>	
+               	</left>  
               </div>
           	</section> 
           	<!-- Main -->
           	<section id="main" class="wrapper style4">
               <div class="title">Fertilization Diary</div>
               <div class="container">
-                <left>  
-              		<a href="#!" data-id="" data-bs-toggle="modal" data-bs-target="#addFertilizationModal"   class="btn btn-success btn-sm" >Add Quantities</a>
-               	</left>  
                 <table id="fertilizationTable" class="table" style="width:100%">
                    	<thead>
                        	<th>Data</th>
@@ -222,12 +217,16 @@
                         <th>Magnesio ml</th>
                         <th>Ferro ml</th>
                         <th>Rinverdente ml</th>
+                        <th>Fosforo ml</th>
 						<th>Stick NPK</th>
                         <th>Options</th>
 					</thead>
 					<tbody>
 					</tbody>
 				</table>
+                <left>  
+              		<a href="#!" data-id="" data-bs-toggle="modal" data-bs-target="#addFertilizationModal"   class="btn btn-success btn-sm" >Add Quantities</a>
+               	</left>  
               </div>
           	</section>        
           	<!-- Footer -->
@@ -271,7 +270,7 @@
 		<!-- Option 1: Bootstrap Bundle with Popper -->
 		<script src="assets/js/jquery-3.6.0.min.js"  crossorigin="anonymous"></script>
 		<script src="assets/js/bootstrap.bundle.min.js"  crossorigin="anonymous"></script>
-		<script type="text/javascript" src="js/dt-1.10.25datatables.min.js"></script>
+		<script type="text/javascript" src="assets/js/dt-1.10.25datatables.min.js"></script>
 		<!-- Option 2: Separate Popper and Bootstrap JS -->
     	<!--
     	<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js" integrity="sha384-IQsoLXl5PILFhosVNubq5LC7Qb9DXgDA9i+tQ8Zj3iwWAwPtgFTxbJ8NT4GN1R8p" crossorigin="anonymous"></script>
@@ -306,12 +305,13 @@
                 var mg= $('#addMgField').val();
                 var fe= $('#addFeField').val();
                 var rinverdente = $('#addRinverdenteField').val();
+                var p= $('#addPField').val();
                 var npk= $('#addNPKField').val();
                 if (key == "Pia12"){
                        $.ajax({
                          url:"Fertilization/add_quantities.php",
                          type:"post",
-                         data:{potassio:k, magnesio:mg, ferro:fe, rinverdente:rinverdente, npk:npk},
+                         data:{potassio:k, magnesio:mg, ferro:fe, rinverdente:rinverdente, fosforo:p, npk:npk},
                          success:function(data){
                            var json = JSON.parse(data);
                            var status = json.status;
@@ -339,6 +339,7 @@
                 var mg= $('#mgField').val();
                 var fe= $('#feField').val();
                 var rinverdente= $('#rinverdenteField').val();
+                var p= $('#pField').val();
                 var npk= $('#npkField').val();
                 var trid= $('#tridQ').val();
                 var id= $('#idQ').val();
@@ -347,7 +348,7 @@
                        $.ajax({
                          url:"Fertilization/update_quantities.php",
                          type:"post",
-                         data:{potassio:k, magnesio:mg, ferro:fe, rinverdente:rinverdente, npk:npk, id:id},
+                         data:{potassio:k, magnesio:mg, ferro:fe, rinverdente:rinverdente, fosforo:p, npk:npk, id:id},
                          success:function(data){
                            var json = JSON.parse(data);
                            var status = json.status;
@@ -362,7 +363,7 @@
                             var row = table.row("[id='"+trid+"']");
                              var dateClass = new Date(date)
                             var dateFormat = dateClass.getDate()+"/"+(dateClass.getMonth()+1)+"/"+dateClass.getFullYear()
-                            row.row("[id='" + trid + "']").data([dateFormat, k, mg, fe, rinverdente, npk, button]);
+                            row.row("[id='" + trid + "']").data([dateFormat, k, mg, fe, rinverdente, p, npk, button]);
                             $('#updateFertilizationModal').modal('hide');
                            }else{
                             alert('failed');
@@ -389,6 +390,7 @@
                  $('#mgField').val(json.mg);
                  $('#feField').val(json.fe);
                  $('#rinverdenteField').val(json.rinverdente);
+                 $('#pField').val(json.p);
                  $('#npkField').val(json.npk);
                  $('#idQ').val(id);
                  $('#dateQ').val(json.data);
@@ -454,31 +456,27 @@
                 var no3= $('#addNo3Field').val();
                 var gh= $('#addGHField').val();
                 var kh= $('#addKHField').val();
+                var po4= $('#addPo4Field').val();
                 if (key == "Pia12"){
-                	if(no2 != '' && no3 != '' && gh != '' && kh != ''){
-                       $.ajax({
-                         url:"waterValuesDirectory/add_user.php",
-                         type:"post",
-                         data:{no2:no2, no3:no3, gh:gh, kh:kh},
-                         success:function(data){
-                           var json = JSON.parse(data);
-                           var status = json.status;
-                           if(status=='true'){
-                            mytable =$('#waterValuesTable').DataTable();
-                            mytable.draw();
-                            $('#addWVModal').modal('hide');
-                            var frm = document.getElementsByName('addUser')[0];
-                            frm.reset();  // Reset all form data
-                           }else{
-                            alert('failed');
-                           }
-                         }
-                      });
-                    }else{
-      					alert('Fill all the required fields');
-    				}
+                    $.ajax({
+                      url:"waterValuesDirectory/add_user.php",
+                      type:"post",
+                      data:{no2:no2, no3:no3, gh:gh, kh:kh, po4:po4},
+                      success:function(data){
+                        var json = JSON.parse(data);
+                        var status = json.status;
+                        if(status=='true'){
+                          mytable =$('#waterValuesTable').DataTable();
+                          mytable.draw();
+                          $('#addWVModal').modal('hide');
+                          var frm = document.getElementsByName('addUser')[0];
+                          frm.reset();  // Reset all form data
+                        }else{
+                          alert('failed');
+                        }
+                      }
+                    });
     			}else{
-                   
       				alert('Key wrong');
     			}
   			});
@@ -490,15 +488,16 @@
                 var no3= $('#no3Field').val();
                 var gh= $('#ghField').val();
                 var kh= $('#khField').val();
+                var po4= $('#po4Field').val();
                 var trid= $('#trid').val();
                 var id= $('#id').val();
                 var date= $('#date').val();
                 if (key == "Pia12"){
-                	if(no2 != '' && no3 != '' && gh != '' && kh != '' ) {
+                	//if(no2 != '' && no3 != '' && gh != '' && kh != '' ) {
                        $.ajax({
                          url:"waterValuesDirectory/update_user.php",
                          type:"post",
-                         data:{no2:no2,no3:no3,gh:gh,kh:kh,id:id},
+                         data:{no2:no2, no3:no3, gh:gh, kh:kh, po4:po4, id:id},
                          success:function(data){
                            var json = JSON.parse(data);
                            var status = json.status;
@@ -513,16 +512,16 @@
                             var row = table.row("[id='"+trid+"']");
                             var dateClass = new Date(date)
                             var dateFormat = dateClass.getDate()+"/"+(dateClass.getMonth()+1)+"/"+dateClass.getFullYear()
-                            row.row("[id='" + trid + "']").data([dateFormat, no2, no3, gh, kh, button]);
+                            row.row("[id='" + trid + "']").data([dateFormat, no2, no3, gh, kh, po4, button]);
                             $('#updateVWModal').modal('hide');
                            }else{
                             alert('failed');
                            }
                          }
                        });
-                    }else{
-        			   alert('Fill all the required fields');
-       			    }
+                    //}else{
+        			//   alert('Fill all the required fields');
+       			    //}
       			}else{
       				alert('Key wrong');
     			}
@@ -543,6 +542,7 @@
                  $('#no3Field').val(json.no3);
                  $('#ghField').val(json.gh);
                  $('#khField').val(json.kh);
+                 $('#po4Field').val(json.po4);
                  $('#id').val(id);
                  $('#date').val(json.data);
                  $('#trid').val(trid);
@@ -580,13 +580,13 @@
         </script>
     	<!-- Scripts 
     	<script src="sito/assets/js/jquery.min.js"></script>-->
-        <script src="assets/js/jquery.dropotron.min.js"></script>
-        <script src="assets/js/browser.min.js"></script>
-        <script src="assets/js/breakpoints.min.js"></script>
-        <script src="assets/js/util.js"></script>
-        <!-- <script src="sito/assets/js/main.js"></script> -->
-        <!-- oppure <script src="https://unpkg.com/flickity@2/dist/flickity.pkgd.min.js"></script> -->
-        <script src="assets/js/flickity.pkgd.min.js"></script>
+    <script src="assets/js/jquery.dropotron.min.js"></script>
+    <script src="assets/js/browser.min.js"></script>
+    <script src="assets/js/breakpoints.min.js"></script>
+    <script src="assets/js/util.js"></script>
+    <!-- <script src="sito/assets/js/main.js"></script> -->
+    <!-- oppure <script src="https://unpkg.com/flickity@2/dist/flickity.pkgd.min.js"></script> -->
+    <script src="assets\js\flickity.pkgd.min.js"></script>
         <script type="text/javascript" src="https://www.google.com/jsapi"></script>
         <script type="text/javascript">
           google.load('visualization', '1', {packages: ['corechart', 'gauge']});
@@ -719,6 +719,12 @@
               						<input type="number" step="any" class="form-control" id="khField" name="kh">
            						</div>
           					</div>
+                            <div class="mb-3 row">
+            					<label for="po4Field" class="col-md-3 form-label">Fosfati</label>
+            					<div class="col-md-9">
+              						<input type="number" step="any" class="form-control" id="po4Field" name="fosfati">
+           						</div>
+          					</div>
           					<div class="text-center">
             					<button type="submit" class="btn btn-primary">Submit</button>
           					</div>
@@ -770,6 +776,12 @@
               						<input type="number" step="any" class="form-control" id="addKHField" name="kh">
             					</div>
           					</div>
+                            <div class="mb-3 row">
+            					<label for="addPo4Field" class="col-md-3 form-label">Fosfati</label>
+            					<div class="col-md-9">
+              						<input type="number" step="any" class="form-control" id="addPo4Field" name="po4">
+            					</div>
+          					</div>
           					<div class="text-center">
             					<button type="submit" class="btn btn-primary">Submit</button>
           					</div>
@@ -819,6 +831,12 @@
             					<label for="addRinverdenteField" class="col-md-3 form-label">Rinverdente</label>
             					<div class="col-md-9">
               						<input type="number" step="any" class="form-control" id="addRinverdenteField" name="rinverdente">
+            					</div>
+          					</div>
+                            <div class="mb-3 row">
+            					<label for="addPField" class="col-md-3 form-label">Fosforo</label>
+            					<div class="col-md-9">
+              						<input type="number" step="any" class="form-control" id="addPField" name="fosforo">
             					</div>
           					</div>
 							<div class="mb-3 row">
@@ -879,6 +897,12 @@
             					<label for="rinverdenteField" class="col-md-3 form-label">Rinverdente</label>
             					<div class="col-md-9">
               						<input type="number" step="any" class="form-control" id="rinverdenteField" name="rinverdente">
+           						</div>
+          					</div>
+                            <div class="mb-3 row">
+            					<label for="pField" class="col-md-3 form-label">Fosforo</label>
+            					<div class="col-md-9">
+              						<input type="number" step="any" class="form-control" id="pField" name="fosforo">
            						</div>
           					</div>
 							<div class="mb-3 row">

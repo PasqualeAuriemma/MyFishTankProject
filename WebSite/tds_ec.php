@@ -258,9 +258,10 @@
 
         <?php // PHP Google Charts
         $dataNow = date('Y-m-d', strtotime("-1 month"));
+        $year = date('Y');
         $query2 = "SELECT FLOOR(tds) as tds, count(id) as count FROM my_myfishtank.tds_tab GROUP BY FLOOR(tds)";
         $query1 = "SELECT data_arrive as date, tds FROM my_myfishtank.tds_tab WHERE FROM_UNIXTIME(data_send, '%Y-%m-%d') >= '$dataNow' ORDER BY data_send"; 
-        $query3 = "SELECT FROM_UNIXTIME(data_send, '%Y,%m -1 ,%d') as data, COUNT(data_send) as value FROM my_myfishtank.tds_tab GROUP BY FROM_UNIXTIME(data_send, '%Y-%m-%d')"; 
+        $query3 = "SELECT FROM_UNIXTIME(data_send, '%Y,%m -1 ,%d') as data, COUNT(data_send) as value FROM my_myfishtank.tds_tab WHERE FROM_UNIXTIME(data_send, '%Y') = '$year' GROUP BY FROM_UNIXTIME(data_send, '%Y-%m-%d')"; 
         $query1EC = "SELECT data_arrive as date, ec FROM my_myfishtank.ec_tab WHERE FROM_UNIXTIME(data_send, '%Y-%m-%d') >= '$dataNow' ORDER BY data_send"; 
         ?> 
         drawPieAreaColumnCharts();

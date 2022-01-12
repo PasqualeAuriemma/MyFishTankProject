@@ -35,42 +35,22 @@ void chackIfSendTempValue(byte pivot, byte Minute, float value, String key, Date
   }
 }
 
-void chackIfSendECValue(byte pivot, byte Minute, float value, String key, DateTime now) {
-  if (key == keyEC && int(value) != 1) {
-    if (H % pivot == 0 && M == Minute && S == int(H / pivot) && S != previousSecSendEC) {
-      previousSecSendEC = S;
+void chackIfSendTDSValue(byte pivot, byte Minute, float value, String key, DateTime now) {
+  if (key == keyTDS && int(value) != 1) {
+    if (H % pivot == 0 && M == Minute && S == int(H / pivot) && S != previousSecSendTDS) {
+      previousSecSendTDS = S;
       sendValueToWeb(value, key, now);
     }
   }
 }
 
-void chackIfSendPHValue(byte pivot, byte Minute, float value, String key, DateTime now) {
-  if (key == keyPh && int(value) != 1) {
-    if (H % pivot == 0 && M == Minute && S == int(H / pivot) && S != previousSecSendPH) {
-      previousSecSendPH = S;
-      sendValueToWeb(value, key, now);
-    }
-  }
-}
-
-// Get EC value
-float activateECMeasurement(byte pivot, byte Minute, float temper) {
+// Get a TDS value
+float activateTDSMeasurement(byte pivot, byte Minute, float temper) {
   if (H % pivot == 0 && M >= Minute && M <= (Minute + 2)) {
-    //Serial.println("EC = " + String(tdsValue));
-    return getEC(temper);
+    //Serial.println("TDS = " + String(tdsValue));
+    return getTDS(temper);
   }else{
     return tds;
-  }
-}
-
-// Get PH value
-float activatePHMeasurement(byte pivot, byte Minute, float temper) {
-  if (H % pivot == 0 && M >= Minute && M <= (Minute + 3)) {
-    float phV =  getPH(temper);
-    //Serial.println("PH = " + String(phV));
-    return phV;
-  }else{
-    return phFinal;
   }
 }
 
@@ -102,21 +82,21 @@ void manageAutomationProcessAndMaintenance(int item, int colItem) {
 
 void manageSendingSettings(int item, int colItem) {
   switch (item) {
-    case 7:
+    case 8:
       if (colItem == 0) {
         config.onOffTemperatureSending = true;
       } else {
         config.onOffTemperatureSending = false;
       }
       break;
-    case 8:
+    case 9:
       if (colItem == 0) {
-        config.onOffECSending = true;
+        config.onOffTDSSending = true;
       } else {
-        config.onOffECSending = false;
+        config.onOffTDSSending = false;
       }
       break;
-    case 9:
+    case 10:
       if (colItem == 0) {
         config.onOffPhSending = true;
       } else {
@@ -132,14 +112,14 @@ void manageSendingSettings(int item, int colItem) {
 void onAutomaticProcess() {
   if(onOffLightAuto){config.onOffLightAuto = true;}
   if(onOffHeater){config.onOffHeater = true;}
-  if(onOffEC){config.onOffEC = true;}
+  if(onOffTDS){config.onOffTDS = true;}
   if(onOffPH){config.onOffPH = true;}
   if(onOffTemperature){config.onOffTemperature = true;}
   if(onOffTemperatureSending){config.onOffTemperatureSending = true;}
-  if(onOffECSending){config.onOffECSending = true;}
+  if(onOffTDSSending){config.onOffTDSSending = true;}
   if(onOffPhSending){config.onOffPhSending = true;}
   //Turning on Fish Feeder and Filter
-  //manageReleSymbolAndAction(4, 0);
+  manageReleSymbolAndAction(4, 0);
   delay(2000);
   manageReleSymbolAndAction(1, 0);
   delay(2000);
@@ -149,11 +129,11 @@ void onAutomaticProcess() {
 void offAutomaticProcess() {
   config.onOffLightAuto = false;
   config.onOffHeater = false;
-  config.onOffEC = false;
+  config.onOffTDS = false;
   config.onOffPH = false;
   config.onOffTemperature = false;
   config.onOffTemperatureSending = false;
-  config.onOffECSending = false;
+  config.onOffTDSSending = false;
   config.onOffPhSending = false;
   //Turning off Fish Feeder, Filter, Termometer, Ossigeno and turning on Lights
   if (releSymbol[0] == 0) {
@@ -171,11 +151,11 @@ void offAutomaticProcess() {
   if (releSymbol[3] == 1) {
     manageReleSymbolAndAction(3, 1);
   }
-  //delay(2000);
-  //if (releSymbol[4] == 1) {
-  //  manageReleSymbolAndAction(4, 1);
-  //}
-  //delay(2000);
+  delay(2000);
+  if (releSymbol[4] == 1) {
+    manageReleSymbolAndAction(4, 1);
+  }
+  delay(2000);
   //for(int i=0; i<numRele; i++){
   //  Serial.println(releSymbol[i]);
   //}

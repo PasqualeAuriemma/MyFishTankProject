@@ -9,10 +9,12 @@ $fe = $_POST['ferro'];
 $fe = !empty($fe) ? "'$fe'" : "NULL";
 $rinverdente = $_POST['rinverdente'];
 $rinverdente = !empty($rinverdente) ? "'$rinverdente'" : "NULL";
+$p = $_POST['fosforo'];
+$p = !empty($p) ? "'$p'" : "NULL";
 $npk = $_POST['npk'];
 $npk = !empty($npk) ? "'$npk'" : "NULL";
 
-$sql = "UPDATE `fertilization_tab` SET  `k`=$k , `mg`= $mg, `fe`=$fe,  `rinverdente`=$rinverdente,  `npk`=$npk  WHERE id='$id' ";
+$sql = "UPDATE `fertilization_tab` SET  `k`=$k , `mg`= $mg, `fe`=$fe,  `rinverdente`=$rinverdente, `p`=$p, `npk`=$npk  WHERE id='$id' ";
 $query= mysqli_query($con,$sql);
 $lastId = mysqli_insert_id($con);
 if($query ==true)

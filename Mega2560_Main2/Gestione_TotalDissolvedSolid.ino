@@ -5,11 +5,11 @@
 
 int analogBuffer[SCOUNT]; // store the analog value in the array, read from ADC
 int analogBufferTemp[SCOUNT];
-int analogBufferIndex = 0, copyIndexEC = 0;
+int analogBufferIndex = 0, copyIndex = 0;
 float averageVoltage = 0, tdsValue = 0;
 
-//Getting the EC from KS0429 Meter V.1 
-float getEC(float temperature) {
+//Getting the TDS from KS0429 Meter V.1 
+float getTDS(float temperature) {
   analogBuffer[analogBufferIndex] = analogRead(TdsSensorPin); //read the analog value and store into the buffer
   analogBufferIndex++;
   if (analogBufferIndex == SCOUNT) {
@@ -19,21 +19,13 @@ float getEC(float temperature) {
   if (millis() - printTimepoint > 1000U)
   {
     printTimepoint = millis();
-    for (copyIndexEC = 0; copyIndexEC < SCOUNT; copyIndexEC++) {
-      analogBufferTemp[copyIndexEC] = analogBuffer[copyIndexEC];
+    for (copyIndex = 0; copyIndex < SCOUNT; copyIndex++) {
+      analogBufferTemp[copyIndex] = analogBuffer[copyIndex];
     }
     averageVoltage = getMedianNum(analogBufferTemp, SCOUNT) * (float)VREF / 1024.0; // read the analog value more stable by the median filtering algorithm, and convert to voltage value
     float compensationCoefficient = 1.0 + 0.02 * (temperature - 25.0); //temperature compensation formula: fFinalResult(25^C) = fFinalResult(current)/(1.0+0.02*(fTP-25.0));
     float compensationVolatge = averageVoltage / compensationCoefficient; //temperature compensation
     tdsValue = (133.42 * compensationVolatge * compensationVolatge * compensationVolatge - 255.86 * compensationVolatge * compensationVolatge + 857.39 * compensationVolatge); //convert voltage value to tds value with european factor
-
-    //Serial.print("voltage:");
-    //Serial.print(averageVoltage);
-    //Serial.print(" temperature:");
-    //Serial.print(temperature,1);
-    //Serial.print("^C  EC:");
-    //Serial.println(tdsValue,2);
-    
     return tdsValue;
   }
 }
