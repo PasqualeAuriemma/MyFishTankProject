@@ -11,8 +11,11 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
     <link rel="stylesheet" href="assets/css/main14.css" />
+    <link href="assets/css/bootstrap5.0.1.min.css" rel="stylesheet"  crossorigin="anonymous">        
+    <script src="assets/js/bootstrap.bundle.min.js"  crossorigin="anonymous"></script>  
     <link rel="stylesheet" href="//code.jquery.com/ui/1.13.0/themes/base/jquery-ui.css">
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    
      <style type="text/css" media="screen">
       .outer {
               width: 100%;  
@@ -244,9 +247,10 @@
 
         <?php // PHP Google Charts
         $dataNow = date('Y-m-d', strtotime("-1 month"));
+        $year = date('Y');
         $query2 = "SELECT ph, count(id) as count FROM my_myfishtank.ph_tab GROUP BY ph";
         $query1 = "SELECT data_arrive as date, ph FROM my_myfishtank.ph_tab WHERE FROM_UNIXTIME(data_send, '%Y-%m-%d') >= '$dataNow' ORDER BY data_send"; 
-        $query3 = "SELECT FROM_UNIXTIME(data_send, '%Y,%m -1 ,%d') as data, COUNT(data_send) as value FROM my_myfishtank.ph_tab GROUP BY FROM_UNIXTIME(data_send, '%Y-%m-%d')"; 
+        $query3 = "SELECT FROM_UNIXTIME(data_send, '%Y,%m -1 ,%d') as data, COUNT(data_send) as value FROM my_myfishtank.ph_tab WHERE FROM_UNIXTIME(data_send, '%Y') = '$year' GROUP BY FROM_UNIXTIME(data_send, '%Y-%m-%d')"; 
         ?> 
         drawPieAreaColumnCharts();
       }

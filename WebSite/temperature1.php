@@ -1,26 +1,18 @@
 <!DOCTYPE HTML>
-
+<!--
+	Escape Velocity by HTML5 UP
+	html5up.net | @ajlkn
+	Free for personal and commercial use under the CCA 3.0 license (html5up.net/license)
+-->
 <html>
   <head>
     <title>PIA12 FISH TANK - AQUARIUM</title>
     <link rel="icon" type="image/png" href="/images/salmon.png">
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
-    <link rel="stylesheet" href="assets/css/main14.css" />
     <link rel="stylesheet" href="//code.jquery.com/ui/1.13.0/themes/base/jquery-ui.css">
-    <link href="assets/css/bootstrap5.0.1.min.css" rel="stylesheet"  crossorigin="anonymous">        
-    <script src="assets/js/bootstrap.bundle.min.js"  crossorigin="anonymous"></script>  
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.js"></script>
-    <style type="text/css" media="screen">
-      .outer {
-              width: 100%;  
-              }
-      .outer > * {
-        display:inline-block;
-        vertical-align:middle;
-      
-      }
-    </style>
+    <link rel="stylesheet" href="assets/css/main14.css" />
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
   </head>
   <body class="homepage is-preload">
     <div id="page-wrapper">
@@ -59,7 +51,6 @@
               <section class="highlight">
                  <p class="style2">
                   Overview with charts
-                  <a href="#!" data-id="" data-bs-toggle="modal" data-bs-target="#addTemperatureModal"   class="btn btn-success btn-sm" >Add Temperature</a>
               </p>
               </section>
             </div>    
@@ -68,20 +59,19 @@
                 <div style="width: 100%; height: 100%;">
                   <?php
                     $dataNow1 = date('Y-m-d'); ?>
-                  
-                  <div class="col-md-3"  style="width: 100%;">
-                    <div class = "outer">  
-                    <div> <h1>On</h1> </div> 
-                    <div>   <input type="text" name="from_date" id="from_date" class="form-control"  size="7" placeholder="<?php echo "$dataNow1" ?>" /> </div> 
-                    <div>   <h1> arrived: </h1> </div> 
-                    <div>   <input type="button" name="filter" id="filter" value="Filter" class="btn btn-info"  style=" border: 0;
+                  <div id = "tt">  
+                  <div class="col-md-3">  
+                    <h3> On
+                      <input type="text" name="from_date" id="from_date" class="form-control"  size="6" placeholder="<?php echo "$dataNow1" ?>" /> 
+                      arrived:
+                      <input type="button" name="filter" id="filter" value="Filter" class="btn btn-info"  style=" border: 0;
                         line-height: 2.5; font-size: 1rem; text-align: center; color: #fff;
                         text-shadow: 1px 1px 1px #000; border-radius: 10px; background-color: rgba(220, 0, 0, 1);
                         background-image: linear-gradient(to top left, rgba(0, 0, 0, .2), rgba(0, 0, 0, .2) 30%,
                         rgba(0, 0, 0, 0)); box-shadow: inset 2px 2px 3px rgba(255, 255, 255, .6),
-                        inset -2px -2px 3px rgba(0, 0, 0, .6);" /> </div> 
-                  
-                    </div>
+                        inset -2px -2px 3px rgba(0, 0, 0, .6);" />
+                    </h3>
+                  </div>
                   </div>  
                   <?php
                     $dataNow1 = date('Y-m-d');  
@@ -179,9 +169,7 @@
         </div>
       </section>
     </div>
-    
-    <link href="css/bootstrap5.0.1.min.css" rel="stylesheet"  crossorigin="anonymous">        
-    <script src="js/bootstrap.bundle.min.js"  crossorigin="anonymous"></script>      
+
     <!-- Scripts -->
     <script src="sito/assets/js/jquery.min.js"></script>
     <script src="sito/assets/js/jquery.dropotron.min.js"></script>
@@ -193,35 +181,6 @@
     <!-- <script src="sito/assets/js/main.js"></script> -->
     <!-- oppure <script src="https://unpkg.com/flickity@2/dist/flickity.pkgd.min.js"></script> -->
     <script src="sito/assets\js\flickity.pkgd.min.js"></script>
-    <script type="text/javascript">
-			$(document).on('submit','#addTemperature',function(e){
-      			e.preventDefault();
-                var key= $('#addKeyField').val();
-                var temp= $('#addTField').val();
-                if (key == "Pia12"){
-                       $.ajax({
-                         url:"add_temperature.php",
-                         type:"post",
-                         data:{temp:temp},
-                         success:function(data){
-                           var json = JSON.parse(data);
-                           var status = json.status;
-                           if(status=='true'){
-                            //location.reload(true);
-                            $('#addTemperatureModal').modal('hide');
-                            var frm = document.getElementsByName('addTemperature')[0];
-                            frm.reset();  // Reset all form data
-                            setInterval(function(){$("#list1").load(window.location.href + " #list1" );}, 1000);
-                           }else{
-                            alert('Query failed');
-                           }
-                         }
-                      });
-    			}else{
-      				alert('Key wrong');
-    			}
-  			});
-    </script>  
     <script>  
       $(document).ready(function(){  
            $.datepicker.setDefaults({  
@@ -258,11 +217,10 @@
 
         <?php // PHP Google Charts
         $dataNow = date('Y-m-d', strtotime("-1 month"));
-        $year = date('Y');
         $query4 = "SELECT AVG(temperature) as media FROM my_myfishtank.temp_tab WHERE FROM_UNIXTIME(data_send, '%Y-%m-%d') >= '$dataNow'";
         $query2 = "SELECT temperature as temp, count(id) as count FROM my_myfishtank.temp_tab GROUP BY temperature";
         $query1 = "SELECT data_arrive as date, temperature as temp FROM my_myfishtank.temp_tab WHERE FROM_UNIXTIME(data_send, '%Y-%m-%d') >= '$dataNow' ORDER BY data_send"; 
-        $query3 = "SELECT FROM_UNIXTIME(data_send, '%Y,%m -1 ,%d') as data, COUNT(data_send) as value FROM my_myfishtank.temp_tab WHERE FROM_UNIXTIME(data_send, '%Y') = '$year' GROUP BY FROM_UNIXTIME(data_send, '%Y-%m-%d')"; 
+        $query3 = "SELECT FROM_UNIXTIME(data_send, '%Y,%m -1 ,%d') as data, COUNT(data_send) as value FROM my_myfishtank.temp_tab WHERE FROM_UNIXTIME(data_send, '%Y') > '2000' GROUP BY FROM_UNIXTIME(data_send, '%Y-%m-%d')"; 
         ?> 
         drawPieAreaColumnCharts();
       }
@@ -489,38 +447,5 @@
     <?php      
     $con->close();
     ?>
-        <!-- Add Fertilization Modal -->
-    	<div class="modal fade" id="addTemperatureModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-  			<div class="modal-dialog">
-    			<div class="modal-content">
-      				<div class="modal-header">
-        				<h5 class="modal-title" id="exampleModalLabel">Add Temperature</h5>
-        				<button7 type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button7>
-      				</div>
-      				<div class="modal-body">
-        				<form id="addTemperature" name="addConductivity" action="">
-             				<div class="mb-3 row">
-            					<label for="addKeyField" class="col-md-3 form-label">Key</label>
-            					<div class="col-md-9">
-              						<input type="password" class="form-control" id="addKeyField" name="key" >
-            					</div>
-          					</div>
-          					<div class="mb-3 row">
-            					<label for="addTField" class="col-md-3 form-label">Temperature</label>
-            					<div class="col-md-9">
-              						<input type="number" class="form-control" id="addTField" name="temperature" >
-            					</div>
-          					</div>
-          					<div class="text-center">
-            					<button type="submit" class="btn btn-primary">Submit</button>
-          					</div>
-        				</form> 
-      				</div>
-     				<div class="modal-footer">
-        				<!--<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>-->
-      				</div>
-    			</div>
-  			</div>
-		</div>  
   </body>
 </html>

@@ -8,11 +8,13 @@ $fe = $_POST['ferro'];
 $fe = !empty($fe) ? "'$fe'" : "NULL";
 $rinverdente = $_POST['rinverdente'];
 $rinverdente = !empty($rinverdente) ? "'$rinverdente'" : "NULL";
+$p = $_POST['fosforo'];
+$p = !empty($p) ? "'$p'" : "NULL";
 $npk = $_POST['npk'];
 $npk = !empty($npk) ? "'$npk'" : "NULL";
 
-$sql = "INSERT INTO `my_myfishtank`.`fertilization_tab` (`k`, `mg`, `fe`, `rinverdente`, `npk`) VALUES ($k, $mg, $fe, $rinverdente, $npk)";
-//$sql = "INSERT INTO fertilization_tab (k,mg, fe, rinverdente, npk) VALUES ($k, $mg, $fe, $rinverdente, $npk)";
+$sql = "INSERT INTO `my_myfishtank`.`fertilization_tab` (`k`, `mg`, `fe`, `rinverdente`, `p`, `npk`) VALUES ($k, $mg, $fe, $rinverdente, $p, $npk)";
+//$sql = "INSERT INTO fertilization_tab (k,mg, fe, rinverdente, p, npk) VALUES ($k, $mg, $fe, $rinverdente, $p, $npk)";
 $query= mysqli_query($con, $sql);
 $lastId = mysqli_insert_id($con);
 if($query == true){

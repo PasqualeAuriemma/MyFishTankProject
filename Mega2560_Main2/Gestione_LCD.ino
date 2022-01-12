@@ -24,8 +24,6 @@ void initScreen() {
 // LCD screen with time and temperature
 void mainScreen() {
   lcd.setCursor(0, 0); lcd.print(buffer);
-  lcd.setCursor (0, 1); lcd.print(phFinal);
-  lcd.setCursor (3, 1); lcd.print(" ");
   lcd.setCursor (4, 1); lcd.print(int(tds));
   lcd.setCursor (7, 1); lcd.print("uS/cm");
   lcd.setCursor (12, 1); lcd.print(" ");
@@ -73,7 +71,7 @@ void menu_(int keyPad) {
       if (colItem == -1) {
         setChangingPageVariable(1, rowItemMainMenu);
       } else if (colItem == 1) {
-        if (rowItem >= 7 && rowItem <= 9) {
+        if (rowItem >= 8 && rowItem <= 10) {
           activeMenu = 9;
         } else {
           activeMenu = 4;
@@ -202,7 +200,7 @@ void menu_(int keyPad) {
         }
       }
       break;
-    case 9: //Serial.println("Menu Si O No Second Manual...");
+    case 9: //Serial.println("Menu Si O No Setting...");
       manageMenuCursors(keyPad, 1, -1, 2);
       if (colItem == -1) {
         setChangingPageVariable(2, rowItemManualMenu);
@@ -223,7 +221,7 @@ void menu_(int keyPad) {
     case 11: //Serial.println("Menu show min - max temperature...");
       manageMenuCursors(keyPad, 1, -1, 2);
       if (colItem == -1) {
-        setChangingPageVariable(3, rowItemSettingMenu);
+        setChangingPageVariable(2, rowItemManualMenu);
         break;
       }
       showTemperatureSetting();
@@ -238,7 +236,7 @@ void menu_(int keyPad) {
         if (rowItem == 2) {
           saveMinMaxTemperature(temperatureMinAndMaxTemp);
         } else if (rowItem == 3) {
-          setChangingPageVariable(3, rowItemSettingMenu);
+          setChangingPageVariable(4, rowItemManualMenu);
         } else {
           break;
         }
@@ -251,7 +249,7 @@ void menu_(int keyPad) {
         if (rowItem == 3) {
           saveFreqUpdateWeb();
         } else if (rowItem == 4) {
-          setChangingPageVariable(3, rowItemSettingMenu);
+          setChangingPageVariable(4, rowItemManualMenu);
         } else {
           break;
         }
@@ -266,7 +264,7 @@ void menu_(int keyPad) {
       showFreqUpdateSetting();
       if (colItem == 1) {
         freqUpdateWebTemperatureIndex = indexNumber(config.freqUpdateWebTemperature);
-        freqUpdateWebECIndex = indexNumber(config.freqUpdateWebEC);
+        freqUpdateWebTDSIndex = indexNumber(config.freqUpdateWebTDS);
         freqUpdateWebPHIndex = indexNumber(config.freqUpdateWebPH);
         setChangingPageVariable(13, 0);
       }
@@ -310,12 +308,12 @@ void showRowItemMenu(int listSize, int rowItem, char **listMenu) {
 }
 
 void manageManualSelection(int rowItemManualMenu, int colItem) {
-  if (rowItemManualMenu < 4) {
+  if (rowItemManualMenu < 5) {
     waitingActionMenu();
     manageReleSymbolAndAction(rowItemManualMenu, colItem);
   } else {
     switch (rowItemManualMenu) {
-      case 4: if (colItem == 0) {
+      case 5: if (colItem == 0) {
           config.onOffTemperatureSending = true;
           config.onOffTemperature = true;
         } else {
@@ -323,15 +321,15 @@ void manageManualSelection(int rowItemManualMenu, int colItem) {
           config.onOffTemperature = false;
         }
         break;
-      case 5: if (colItem == 0) {
-          config.onOffECSending = true;
-          config.onOffEC = true;
+      case 6: if (colItem == 0) {
+          config.onOffTDSSending = true;
+          config.onOffTDS = true;
         } else {
-          config.onOffECSending = false;
-          config.onOffEC = false;
+          config.onOffTDSSending = false;
+          config.onOffTDS = false;
         }
         break;
-      case 6: if (colItem == 0) {
+      case 7: if (colItem == 0) {
           config.onOffPhSending = true;
           config.onOffPH = true;
         } else {
@@ -415,15 +413,15 @@ void menuPageSelection(int arrowItem, int row, int whatMenu) {
   } else if (whatMenu == 9) {
     lcd.setCursor(0, 0);
     Serial.println(row);
-    if (row == 7) {
+    if (row == 8) {
       lcd.print("Send Temp is");
       lcd.setCursor(13, 0);
       lcd.print(enabledToSend(config.onOffTemperatureSending));
-    } else if (row == 8) {
+    } else if (row == 9) {
       lcd.print("Send EC is");
       lcd.setCursor(13, 0);
-      lcd.print(enabledToSend(config.onOffECSending));
-    } else if (row == 9) {
+      lcd.print(enabledToSend(config.onOffTDSSending));
+    } else if (row == 10) {
       lcd.print("Send PH is");
       lcd.setCursor(13, 0);
       lcd.print(enabledToSend(config.onOffPhSending));
@@ -534,10 +532,10 @@ void showFreqUpdateSetting() {
     showStringNumber(3, 1, 24 / config.freqUpdateWebTemperature);
   }
   lcd.setCursor(6, 1); lcd.print("E:");
-  if (config.freqUpdateWebEC == 23) {
+  if (config.freqUpdateWebTDS == 23) {
     showStringNumber(8, 1, 1);
   } else {
-    showStringNumber(8, 1, 24 / config.freqUpdateWebEC);
+    showStringNumber(8, 1, 24 / config.freqUpdateWebTDS);
   }
   lcd.setCursor (11, 1); lcd.print("P:");
   if (config.freqUpdateWebPH == 23) {
@@ -773,11 +771,11 @@ void setFreqUpdateMenu(int keyPad, int row) {
   if (row == 0) {
     freqUpdateWebTemperatureIndex = manageMenuRangeNumberCursors(keyPad, row , freqUpdateWebTemperatureIndex, 0, 8);
   } else if (row == 1) {
-    freqUpdateWebECIndex = manageMenuRangeNumberCursors(keyPad, row, freqUpdateWebECIndex, 0, 8);
+    freqUpdateWebTDSIndex = manageMenuRangeNumberCursors(keyPad, row, freqUpdateWebTDSIndex, 0, 8);
   } else if (row == 2) {
     freqUpdateWebPHIndex = manageMenuRangeNumberCursors(keyPad, row, freqUpdateWebPHIndex, 0, 8);
   }
-  showManageFreqSetting(row, freqUpdateWebTemperatureIndex, freqUpdateWebECIndex, freqUpdateWebPHIndex);
+  showManageFreqSetting(row, freqUpdateWebTemperatureIndex, freqUpdateWebTDSIndex, freqUpdateWebPHIndex);
 }
 
 void shiftHourAndMinutesMenu(int i, int j, int keyPad, String firstS, String secondS, int row, byte *oraEMin) {
@@ -942,7 +940,7 @@ void saveMinMaxTemperature(byte *minMax) {
 void saveFreqUpdateWeb() {
 
   config.freqUpdateWebTemperature = setFreq(freqUpdateWebTemperatureIndex);
-  config.freqUpdateWebEC = setFreq(freqUpdateWebECIndex);
+  config.freqUpdateWebTDS = setFreq(freqUpdateWebTDSIndex);
   config.freqUpdateWebPH = setFreq(freqUpdateWebPHIndex);
   waitingActionMenu();
   saveConfiguration(filename, config);

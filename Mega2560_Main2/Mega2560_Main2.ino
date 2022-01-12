@@ -13,22 +13,14 @@
 #include <LiquidCrystal.h>
 #include <OneWire.h>
 #include <MemoryFree.h>
-#include "DFRobot_PH.h"
 #include <EEPROM.h>
 
 
 /***************************************************************/
 
-/* PH */
-#define PH_PIN A2
-float voltage, phValue;
-DFRobot_PH ph;
-
-/*EC - TDS*/
 #define TdsSensorPin A1
-#define VREF 4.65// analog reference voltage(Volt) of the ADC
+#define VREF 4.7 // analog reference voltage(Volt) of the ADC
 #define SCOUNT 30 // sum of sample point
-
 // All of the backpacks like the one shown are at 0x27.
 #define I2C_ADDR   0x27 // <--Change to match your display. Use scanner.ino to find address.
 #define DS18B20_Pin  42
@@ -59,7 +51,7 @@ const byte keypadPin = A0;
    VIN alimentazione board
    -----------------I ANALOGICI-----------------------------------
    A0 Tasti keypad
-   A1 TDS-EC Meter v 1.0 KS0429
+   A1 TDS Meter v 1.0 KS0429
    A2 LIBERO
    A3 LIBERO
    A4 SDA I2C RTC
@@ -68,11 +60,11 @@ const byte keypadPin = A0;
 
 boolean onOffLightAuto = true;
 boolean onOffHeater = true;
-boolean onOffEC = true;
+boolean onOffTDS = true;
 boolean onOffPH = true;
 boolean onOffTemperature = true;
 boolean onOffTemperatureSending = true;
-boolean onOffECSending = true;
+boolean onOffTDSSending = true;
 boolean onOffPhSending = true;
 
 /****************************************************************/
@@ -84,13 +76,13 @@ byte temperatureMinAndMaxTemp[2] = {0, 0};
 int temperature = 0;
 int freqNumbber[8] = {24, 12, 8, 6, 4, 3, 2, 1};
 int freqUpdateWebTemperatureIndex = 0;
-int freqUpdateWebECIndex = 0;
+int freqUpdateWebTDSIndex = 0;
 int freqUpdateWebPHIndex = 0;
-byte rele[5] = {2, 3, 4, 5};
-// ------------------  EC Meter  --------------------------------
+byte rele[5] = {2, 3, 4, 5, 6};
+// ------------------  TDS Meter  --------------------------------
+bool activeContinuousTDSMeasurement = false;
 float tds = 0.0;
-// ------------------  PH GRAVITY  -------------------------------
-float phFinal = 0.0;
+float tds_continuous = 0.0;
 // ------------------   SD varables   ----------------------------
 struct Config {
   int startHour;
@@ -103,15 +95,15 @@ struct Config {
   bool manteinEnabled;
   bool onOffLightAuto;
   bool onOffHeater;
-  bool onOffEC;
+  bool onOffTDS;
   bool onOffPH;
   bool onOffTemperature;
   bool onOffFilter;
   bool onOffTemperatureSending;
-  bool onOffECSending;
+  bool onOffTDSSending;
   bool onOffPhSending;
   int freqUpdateWebTemperature;
-  int freqUpdateWebEC;
+  int freqUpdateWebTDS;
   int freqUpdateWebPH;
   char hostname[64];
 };
@@ -119,7 +111,7 @@ const char *filename = "SETTINGS.TXT";  // <- SD library uses 8.3 filenames
 Config config;                         // <- global configuration object
 // ------------------   WIFI variables   -------------------------
 char *keyTemp = "Temp";
-char *keyEC = "Ec";
+char *keyTDS = "Ec";
 char *keyPh = "Ph";
 char *connStatus = "";
 // ------------------   Frame rate   -----------------------------
@@ -136,8 +128,7 @@ int _timerLightDisplay = 0; //temp
 char buffer[16];
 byte previousSec = 0;
 byte previousSecSend = 55; //random
-byte previousSecSendEC = 55; //random
-byte previousSecSendPH = 55; //random
+byte previousSecSendTDS = 55; //random
 byte H = 0;
 byte M = 0;
 byte S = 0;
@@ -147,8 +138,8 @@ bool menuOnOff = false;
 bool changingPage = false;
 // ------------------   LCD variables   --------------------------
 byte startReleSimbolsOnLCD = 11;
-int releSymbol[5] = {0, 0, 0, 0};
-int numRele = 4;
+int releSymbol[5] = {0, 0, 0, 0, 0};
+int numRele = 5;
 //-------------------   LCD Special characters   -----------------
 uint8_t SPENTO[8] = {0x0E, 0x11, 0x11, 0x11, 0x0A, 0x0E, 0x0E, 0x04,};
 uint8_t ACCESO[8] = {0x0E, 0x1F, 0x1F, 0x1F, 0x0E, 0x0E, 0x0E, 0x04,};
@@ -175,8 +166,9 @@ char menuItem4[maxSize] = "Luci";
 char menuItem5[maxSize] = "Filtro";
 char menuItem6[maxSize] = "Riscaldatore";
 char menuItem7[maxSize] = "Ossigeno";
+char menuItem8[maxSize] = "Mangiatoia";
 char menuItem9[maxSize] = "Termometro";
-char menuItem18[maxSize] = "EC Meter";
+char menuItem18[maxSize] = "TDS Meter";
 char menuItem19[maxSize] = "PH Meter";
 char menuItem14[maxSize] = "Enable T Send";
 char menuItem15[maxSize] = "Enable EC Send";
@@ -192,7 +184,7 @@ char menuItem20[maxSize] = "Set Freq to web";
 //----------------   Initialize Menu Array   ---------------------
 char *mainMenu[4];
 int mainMenuSize = 0;
-char *manualMenu[10];
+char *manualMenu[11];
 int manualMenuSize = 0;
 char *settingMenu[7];
 int settingMenuSize = 0;
@@ -221,7 +213,6 @@ void setup() {
     Serial.println(F("Initialize SD library"));
   }
   
-  //SD.remove(filename);
   if (SD.exists(filename)) {
     // Should load default config if run for the first time
     Serial.println(F("Loading configuration..."));
@@ -286,12 +277,13 @@ void setup() {
   manualMenu[1] = menuItem5;
   manualMenu[2] = menuItem6;
   manualMenu[3] = menuItem7;
-  manualMenu[4] = menuItem9;
-  manualMenu[5] = menuItem18;
-  manualMenu[6] = menuItem19;
-  manualMenu[7] = menuItem14;
-  manualMenu[8] = menuItem15;
-  manualMenu[9] = menuItem16;
+  manualMenu[4] = menuItem8;
+  manualMenu[5] = menuItem9;
+  manualMenu[6] = menuItem18;
+  manualMenu[7] = menuItem19;
+  manualMenu[8] = menuItem14;
+  manualMenu[9] = menuItem15;
+  manualMenu[10] = menuItem16;
   manualMenuSize = sizeof(manualMenu) / sizeof(manualMenu[0]);
   //-----------------------   Setting Menu Page   -------------------
   settingMenu[0] = menuItem10;
@@ -327,15 +319,10 @@ void loop() {
   if (config.onOffTemperature) {
     temperature = getTemp();
   }
-  //getEC(temperature);
-  //Get EC values automatically only when it is the right time to get it 
-  if (config.onOffEC) {
-    tds = activateECMeasurement(config.freqUpdateWebEC, 10, temperature);
-  }
-
-  //Get PH values automatically only when it is the right time to get it 
-  if (config.onOffPH) {
-    phFinal = activatePHMeasurement(config.freqUpdateWebPH, 32, temperature);
+  
+  //Get TDS values automatically only when it is the right time to get it 
+  if (config.onOffTDS) {
+    tds = activateTDSMeasurement(config.freqUpdateWebTDS, 10, temperature);
   }
 
   //turning on the heater automatically if it is enabled
@@ -355,7 +342,7 @@ void loop() {
   //  Serial.println("KEY PAD VALUE = " + String(key));
   //  Serial.println("ACTIVE MENU = " + String(activeMenu));
   //  Serial.println("MENU = " + String(menuOnOff));
-  //  Serial.println("EC = " + String(tds));
+  //  Serial.println("TDS = " + String(tds));
 
   //Check when turning on the screen backlight
   checkScreenBeckLight(key);
@@ -365,14 +352,9 @@ void loop() {
     chackIfSendTempValue(config.freqUpdateWebTemperature, 0, temperature, keyTemp, now);
   }
   
-  //Sending EC value to WEB DB 5 minute later after ec measurement
-  if (config.onOffECSending) {
-    chackIfSendECValue(config.freqUpdateWebEC, 15, float(tds), keyEC, now);
-  }
-
-  //Sending PH value to WEB DB 5 minute later after PH measurement
-  if (config.onOffPhSending) {
-    chackIfSendPHValue(config.freqUpdateWebPH, 37, float(phFinal), keyPh, now);
+  //Sent the TDS to WEB DB 5 minute later than tds measurement
+  if (config.onOffTDSSending) {
+    chackIfSendTDSValue(config.freqUpdateWebTDS, 15, float(tds), keyTDS, now);
   }
 
   //menu on lcd

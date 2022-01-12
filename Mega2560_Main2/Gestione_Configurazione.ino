@@ -31,15 +31,15 @@ void loadConfiguration(const char *filename, Config &config) {
   config.manteinEnabled = doc["manteinEnabled"];
   config.onOffLightAuto = doc["onOffLightAuto"];
   config.onOffHeater = doc["onOffHeater"];
-  config.onOffEC = doc["onOffEC"];
+  config.onOffTDS = doc["onOffTDS"];
   config.onOffPH = doc["onOffPH"];
   config.onOffTemperature = doc["onOffTemperature"];
   config.onOffFilter = doc["onOffFilter"];
   config.onOffTemperatureSending = doc["onOffTemperatureSending"];
-  config.onOffECSending = doc["onOffECSending"];
+  config.onOffTDSSending = doc["onOffTDSSending"];
   config.onOffPhSending = doc["onOffPhSending"];
   config.freqUpdateWebTemperature = doc["freqUpdateWebTemperature"];
-  config.freqUpdateWebEC = doc["freqUpdateWebEC"];
+  config.freqUpdateWebTDS = doc["freqUpdateWebTDS"];
   config.freqUpdateWebPH = doc["freqUpdateWebPH"];
   strlcpy(config.hostname,                  // <- destination
           doc["hostname"] | "example.com",  // <- source
@@ -77,15 +77,15 @@ void saveConfiguration(const char *filename, const Config &config) {
   doc["manteinEnabled"] = config.manteinEnabled;
   doc["onOffLightAuto"] = config.onOffLightAuto;
   doc["onOffHeater"] = config.onOffHeater;
-  doc["onOffEC"] = config.onOffEC;
+  doc["onOffTDS"] = config.onOffTDS;
   doc["onOffPH"] = config.onOffPH;
   doc["onOffTemperature"] = config.onOffTemperature;
   doc["onOffFilter"] = config.onOffFilter;
   doc["onOffTemperatureSending"] = config.onOffTemperatureSending;
-  doc["onOffECSending"] = config.onOffECSending;
+  doc["onOffTDSSending"] = config.onOffTDSSending;
   doc["onOffPhSending"] = config.onOffPhSending;
   doc["freqUpdateWebTemperature"] = config.freqUpdateWebTemperature;
-  doc["freqUpdateWebEC"] = config.freqUpdateWebEC;
+  doc["freqUpdateWebTDS"] = config.freqUpdateWebTDS;
   doc["freqUpdateWebPH"] = config.freqUpdateWebPH;
   doc["hostname"] = config.hostname;
 
@@ -126,15 +126,15 @@ void setConfiguration(const char *filename, Config &config) {
   doc["manteinEnabled"] = false;
   doc["onOffLightAuto"] = false;
   doc["onOffHeater"] = false;
-  doc["onOffEC"] = false;
+  doc["onOffTDS"] = false;
   doc["onOffPH"] = false;
   doc["onOffTemperature"] = false;
   doc["onOffFilter"] = false;
   doc["onOffTemperatureSending"] = false;
-  doc["onOffECSending"] = false;
+  doc["onOffTDSSending"] = false;
   doc["onOffPhSending"] = false;
   doc["freqUpdateWebTemperature"] = 0;
-  doc["freqUpdateWebEC"] = 0;
+  doc["freqUpdateWebTDS"] = 0;
   doc["freqUpdateWebPH"] = 0;
   doc["hostname"] = "myfishtank.altervista.org";
   config.startHour = doc["startHour"];
@@ -147,15 +147,15 @@ void setConfiguration(const char *filename, Config &config) {
   config.manteinEnabled = doc["manteinEnabled"];
   config.onOffLightAuto = doc["onOffLightAuto"];
   config.onOffHeater = doc["onOffHeater"];
-  config.onOffEC = doc["onOffEC"];
+  config.onOffTDS = doc["onOffTDS"];
   config.onOffPH = doc["onOffPH"];
   config.onOffTemperature = doc["onOffTemperature"];
   config.onOffFilter = doc["onOffFilter"];
   config.onOffTemperatureSending = doc["onOffTemperatureSending"];
-  config.onOffECSending = doc["onOffECSending"];
+  config.onOffTDSSending = doc["onOffTDSSending"];
   config.onOffPhSending = doc["onOffPhSending"];
   config.freqUpdateWebTemperature = doc["freqUpdateWebTemperature"];
-  config.freqUpdateWebEC = doc["freqUpdateWebEC"];
+  config.freqUpdateWebTDS = doc["freqUpdateWebTDS"];
   config.freqUpdateWebPH = doc["freqUpdateWebPH"];
   strlcpy(config.hostname,                  // <- destination
           doc["hostname"] | "example.com",  // <- source

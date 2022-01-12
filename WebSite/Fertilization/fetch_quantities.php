@@ -9,11 +9,12 @@ $total_all_rows = mysqli_num_rows($totalQuery);
 if(isset($_POST['search']['value']))
 {
 	$search_value = $_POST['search']['value'];
-	$sql .= " WHERE data like '%".$search_value."%'";
+	$sql .= " WHERE FORMAT(data, 'dd/MM/yyyy', 'en-US' ) like '%".$search_value."%'";
 	$sql .= " OR k like '%".$search_value."%'";
 	$sql .= " OR mg like '%".$search_value."%'";
 	$sql .= " OR fe like '%".$search_value."%'";
     $sql .= " OR rinverdente like '%".$search_value."%'";
+    $sql .= " OR p like '%".$search_value."%'";
     $sql .= " OR npk like '%".$search_value."%'";
 }
 
@@ -47,6 +48,7 @@ while($row = mysqli_fetch_assoc($query))
 	$sub_array[] = $row['mg'];
 	$sub_array[] = $row['fe'];
     $sub_array[] = $row['rinverdente'];
+    $sub_array[] = $row['p'];
     $sub_array[] = $row['npk'];
 	$sub_array[] = '<a href="javascript:void();" data-id="'.$row['id'].'"  class="btn btn-info btn-sm editbtnF" >Edit</a>  <a href="javascript:void();" data-id="'.$row['id'].'"  class="btn btn-danger btn-sm deleteBtnF" >Delete</a>';
 	$data[] = $sub_array;

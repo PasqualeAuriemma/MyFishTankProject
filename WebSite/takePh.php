@@ -3,6 +3,7 @@
 
   if(!empty($_POST)){
     $ph = $_POST["Ph"];
+    $ph = round($ph,2);
     $dataSend = substr($_POST["Date"], 0, 10);
     $query = "INSERT INTO ph_tab (ph, data_send)
             VALUES ('".$ph."', '".$dataSend."')";
