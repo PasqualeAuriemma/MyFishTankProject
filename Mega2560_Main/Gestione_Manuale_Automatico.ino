@@ -56,10 +56,9 @@ void chackIfSendPHValue(byte pivot, byte Minute, float value, String key, DateTi
 // Get EC value
 float activateECMeasurement(byte pivot, byte Minute, float temper) {
   if (H % pivot == 0 && M >= Minute && M <= (Minute + 2)) {
-    //Serial.println("EC = " + String(tdsValue));
     return getEC(temper);
   }else{
-    return tds;
+    return ec;
   }
 }
 
