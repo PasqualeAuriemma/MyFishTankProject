@@ -81,14 +81,14 @@ byte oraEMinTimeClockTemp[2] = {0, 0};
 int dateTemp[3] = {0, 0, 0};
 byte oraEMinTemp[4] = {0, 0, 0, 0};
 byte temperatureMinAndMaxTemp[2] = {0, 0};
-int temperature = 0;
+float temperature = 0.0;
 int freqNumbber[8] = {24, 12, 8, 6, 4, 3, 2, 1};
 int freqUpdateWebTemperatureIndex = 0;
 int freqUpdateWebECIndex = 0;
 int freqUpdateWebPHIndex = 0;
 byte rele[5] = {2, 3, 4, 5};
 // ------------------  EC Meter  --------------------------------
-float tds = 0.0;
+float ec = 0.0;
 // ------------------  PH GRAVITY  -------------------------------
 float phFinal = 0.0;
 // ------------------   SD varables   ----------------------------
@@ -175,12 +175,14 @@ char menuItem4[maxSize] = "Luci";
 char menuItem5[maxSize] = "Filtro";
 char menuItem6[maxSize] = "Riscaldatore";
 char menuItem7[maxSize] = "Ossigeno";
-char menuItem9[maxSize] = "Termometro";
-char menuItem18[maxSize] = "EC Meter";
-char menuItem19[maxSize] = "PH Meter";
+char menuItem9[maxSize] = "Enable Termom.";
+char menuItem18[maxSize] = "Enable EC Meter";
+char menuItem19[maxSize] = "Enable PH Meter";
 char menuItem14[maxSize] = "Enable T Send";
 char menuItem15[maxSize] = "Enable EC Send";
 char menuItem16[maxSize] = "Enable PH Send";
+char menuItem22[maxSize] = "Get EC Value";
+char menuItem23[maxSize] = "Get PH Value";
 //-----------------------   Settings   --------------------------
 char menuItem10[maxSize] = "Set Timer Luci";
 char menuItem11[maxSize] = "Set Orario";
@@ -292,6 +294,8 @@ void setup() {
   manualMenu[7] = menuItem14;
   manualMenu[8] = menuItem15;
   manualMenu[9] = menuItem16;
+//  manualMenu[10] = menuItem22;
+//  manualMenu[11] = menuItem23;
   manualMenuSize = sizeof(manualMenu) / sizeof(manualMenu[0]);
   //-----------------------   Setting Menu Page   -------------------
   settingMenu[0] = menuItem10;
@@ -327,12 +331,14 @@ void loop() {
   if (config.onOffTemperature) {
     temperature = getTemp();
   }
-  //getEC(temperature);
+  //ec = getEC(temperature);
+  //Serial.println(ec);
   //Get EC values automatically only when it is the right time to get it 
   if (config.onOffEC) {
-    tds = activateECMeasurement(config.freqUpdateWebEC, 10, temperature);
+    ec = activateECMeasurement(config.freqUpdateWebEC, 10, temperature);
   }
-
+ 
+  //Serial.println(getEC(25.6));
   //Get PH values automatically only when it is the right time to get it 
   if (config.onOffPH) {
     phFinal = activatePHMeasurement(config.freqUpdateWebPH, 32, temperature);
@@ -355,7 +361,7 @@ void loop() {
   //  Serial.println("KEY PAD VALUE = " + String(key));
   //  Serial.println("ACTIVE MENU = " + String(activeMenu));
   //  Serial.println("MENU = " + String(menuOnOff));
-  //  Serial.println("EC = " + String(tds));
+  //  Serial.println("EC = " + String(ec));
 
   //Check when turning on the screen backlight
   checkScreenBeckLight(key);
@@ -367,7 +373,7 @@ void loop() {
   
   //Sending EC value to WEB DB 5 minute later after ec measurement
   if (config.onOffECSending) {
-    chackIfSendECValue(config.freqUpdateWebEC, 15, float(tds), keyEC, now);
+    chackIfSendECValue(config.freqUpdateWebEC, 15, float(ec), keyEC, now);
   }
 
   //Sending PH value to WEB DB 5 minute later after PH measurement

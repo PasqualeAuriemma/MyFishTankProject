@@ -23,12 +23,12 @@ float getPH(float temperature) {
         //temperature = readTemperature();         // read your temperature sensor to execute temperature compensation
         voltage = getMedianNum(analogBufferTempPH, SCOUNT)/1024.0*5000;  // read the analog value more stable by the median filtering algorithm, and convert to voltage real value
         phValue = ph.readPH(voltage,temperature);  // convert voltage to pH with temperature compensation
-        Serial.print("voltage:");
-        Serial.print(voltage);
-        Serial.print(" temperature:");
-        Serial.print(temperature,1);
-        Serial.print("^C  pH:");
-        Serial.println(phValue,2);
+        //Serial.print("voltage:");
+        //Serial.print(voltage);
+        //Serial.print(" temperature:");
+        //Serial.print(temperature,1);
+        //Serial.print("^C  pH:");
+        //Serial.println(phValue,2);
     }
     ph.calibration(voltage, temperature);  
     

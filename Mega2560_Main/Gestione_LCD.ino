@@ -26,10 +26,10 @@ void mainScreen() {
   lcd.setCursor(0, 0); lcd.print(buffer);
   lcd.setCursor (0, 1); lcd.print(phFinal);
   lcd.setCursor (3, 1); lcd.print(" ");
-  lcd.setCursor (4, 1); lcd.print(int(tds));
+  lcd.setCursor (4, 1); lcd.print(int(ec));
   lcd.setCursor (7, 1); lcd.print("uS/cm");
   lcd.setCursor (12, 1); lcd.print(" ");
-  lcd.setCursor (13, 1); lcd.print(temperature);
+  lcd.setCursor (13, 1); lcd.print(int(temperature));
   lcd.setCursor (15, 1); lcd.write(byte(2));
  
 }
