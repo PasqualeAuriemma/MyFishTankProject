@@ -2,6 +2,7 @@
   Aquarium Project Pasquale
 */
 
+
 int analogBufferPH[SCOUNT]; // store the analog value in the array, read from ADC
 int analogBufferTempPH[SCOUNT];
 int analogBufferIndexPH = 0, copyIndexPH = 0;

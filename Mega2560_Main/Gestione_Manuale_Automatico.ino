@@ -12,8 +12,8 @@
 void sendValueToWeb(float value, String key, DateTime now) {
   String timeStamp = String(now.unixtime());
   String payload = "";
-  String fileName = key + "_v.jso";
-  saveValue(fileName, value, timeStamp, key);
+  //String fileName = key + "_v.jso";
+  //saveValue(fileName, value, timeStamp, key);
   
   payload += key;
   payload += "=";
@@ -24,6 +24,26 @@ void sendValueToWeb(float value, String key, DateTime now) {
   payload += ";";
   Serial.println(payload);
   Serial3.println(payload);
+}
+
+void resendValueToWeb(String value, String key,  String timeStamp) {
+  String payload = "";
+  payload += key;
+  payload += "=";
+  payload += value;
+  payload += ":";
+  payload += "Date=";
+  payload +=  timeStamp;
+  payload += ";";
+  Serial.println(payload);
+  Serial3.println(payload);
+}
+
+void chackWhenResendMeasure(byte _hour, byte _minute) {
+    if (H == _hour && M == _minute && S != previousSecResend) {
+    loadingNotSendedMeasure();
+    previousSecResend = S;
+    }
 }
 
 void chackIfSendTempValue(byte pivot, byte Minute, float value, String key, DateTime now) {
@@ -65,7 +85,7 @@ float activateECMeasurement(byte pivot, byte Minute, float temper) {
 // Get PH value
 float activatePHMeasurement(byte pivot, byte Minute, float temper) {
   if (H % pivot == 0 && M >= Minute && M <= (Minute + 3)) {
-    float phV =  getPH(temper);
+    float phV = getPH(temper);
     //Serial.println("PH = " + String(phV));
     return phV;
   }else{
@@ -76,10 +96,9 @@ float activatePHMeasurement(byte pivot, byte Minute, float temper) {
 
 void manageAutomationProcessAndMaintenance(int item, int colItem) {
   switch (item) {
-    case 0:
+    case 1:
       if (colItem == 0) {
-        config.autoEnabled = true;
-        config.manteinEnabled = false;
+        config.autoEnabled = true; config.manteinEnabled = false;
         onAutomaticProcess();
       } else {
         config.autoEnabled = false;
@@ -88,7 +107,8 @@ void manageAutomationProcessAndMaintenance(int item, int colItem) {
       break;
     case 2:
       if (colItem == 0) {
-        config.manteinEnabled = true; config.autoEnabled = false; offAutomaticProcess();
+        config.manteinEnabled = true; config.autoEnabled = false; 
+        offAutomaticProcess();
       } else {
         config.manteinEnabled = false;
         onAutomaticProcess();
@@ -99,28 +119,52 @@ void manageAutomationProcessAndMaintenance(int item, int colItem) {
   saveConfiguration(filename, config);
 }
 
-void manageSendingSettings(int item, int colItem) {
+void manageSettingsSelections(int item, int colItem) {
   switch (item) {
-    case 7:
-      if (colItem == 0) {
+    case 7: if (colItem == 0) {
         config.onOffTemperatureSending = true;
+        config.onOffTemperature = true;
       } else {
         config.onOffTemperatureSending = false;
+        config.onOffTemperature = false;
       }
       break;
-    case 8:
-      if (colItem == 0) {
+    case 8: if (colItem == 0) {
         config.onOffECSending = true;
+        config.onOffEC = true;
       } else {
-        config.onOffECSending = false;
+          config.onOffECSending = false;
+          config.onOffEC = false;
       }
       break;
-    case 9:
-      if (colItem == 0) {
+    case 9: if (colItem == 0) {
         config.onOffPhSending = true;
+        config.onOffPH = true;
       } else {
         config.onOffPhSending = false;
+        config.onOffPH = false;
       }
+      break;
+    case 10:
+      if (colItem == 0 && !config.onOffTemperatureSending) {
+        config.onOffTemperatureSending = true;
+      } else if (colItem == 0 && config.onOffTemperatureSending) {
+        config.onOffTemperatureSending = false;
+      } 
+      break;
+    case 11:
+      if (colItem == 0 && !config.onOffECSending) {
+        config.onOffECSending = true;
+      } else if (colItem == 0 && config.onOffECSending) {
+        config.onOffECSending = false;
+      } 
+      break;
+    case 12:
+      if (colItem == 0 && !config.onOffPhSending) {
+        config.onOffPhSending = true;
+      } else if (colItem == 0 && config.onOffPhSending) {
+        config.onOffPhSending = false;
+      } 
       break;
     default: break;
   }
@@ -137,11 +181,8 @@ void onAutomaticProcess() {
   if(onOffTemperatureSending){config.onOffTemperatureSending = true;}
   if(onOffECSending){config.onOffECSending = true;}
   if(onOffPhSending){config.onOffPhSending = true;}
-  //Turning on Fish Feeder and Filter
-  //manageReleSymbolAndAction(4, 0);
-  delay(2000);
   manageReleSymbolAndAction(1, 0);
-  delay(2000);
+ 
 }
 
 //
@@ -154,36 +195,27 @@ void offAutomaticProcess() {
   config.onOffTemperatureSending = false;
   config.onOffECSending = false;
   config.onOffPhSending = false;
-  //Turning off Fish Feeder, Filter, Termometer, Ossigeno and turning on Lights
+  //Turning off Filter, Termometer, Ossigeno and turning on Lights
   if (releSymbol[0] == 0) {
     manageReleSymbolAndAction(0, 0);
   }
-  delay(2000);
+  delay(1000);
   if (releSymbol[1] == 1) {
     manageReleSymbolAndAction(1, 1);
   }
-  delay(2000);
+  delay(1000);
   if (releSymbol[2] == 1) {
     manageReleSymbolAndAction(2, 1);
   }
-  delay(2000);
+  delay(1000);
   if (releSymbol[3] == 1) {
     manageReleSymbolAndAction(3, 1);
   }
-  //delay(2000);
-  //if (releSymbol[4] == 1) {
-  //  manageReleSymbolAndAction(4, 1);
-  //}
-  //delay(2000);
-  //for(int i=0; i<numRele; i++){
-  //  Serial.println(releSymbol[i]);
-  //}
+  screen->releSymbolMenu();
 }
 
-//Turning On or Turning Off the selected rele and show them on screen LCD
+//Turning On or Turning Off the selected rele and show them on screen
 void manageReleSymbolAndAction(byte index, int onOff) {
-  lcd.clear();
-  lcd.setCursor((startReleSimbolsOnLCD + index ), 0);
   if (onOff == 0) {
     digitalWrite(rele[index], LOW);
     releSymbol[index] = 1;
