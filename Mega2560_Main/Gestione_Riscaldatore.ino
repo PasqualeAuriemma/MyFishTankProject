@@ -10,10 +10,10 @@ void manageAcquarioumHeater(int temperature) {
       temperature != -1000 && temperature != 0) {
     tempOnOffHeater = true;
     manageReleSymbolAndAction(2, 0);
-    showReleSymbol();
+    screen->releSymbolMenu();
   } else if ((temperature > config.tempMax && tempOnOffHeater)) {
     tempOnOffHeater = false;
     manageReleSymbolAndAction(2, 1);
-    showReleSymbol();
+    screen->releSymbolMenu();
   }
 }

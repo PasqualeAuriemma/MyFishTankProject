@@ -30,11 +30,11 @@ void manageAquariumLights(int h, int m) {
   if (checkStart <= tempTime && checkEnd > tempTime && !tempOnOffLight) {
     tempOnOffLight = true;
     manageReleSymbolAndAction(0, 0);
-    showReleSymbol();
+    screen->releSymbolMenu();
   } else if (!(checkStart <= tempTime && checkEnd > tempTime ) && tempOnOffLight) {
     tempOnOffLight = false;
     manageReleSymbolAndAction(0, 1);
-    showReleSymbol();
+    screen->releSymbolMenu();
   }
 
   //  Serial.println("orario timer per illuminazione");

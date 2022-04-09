@@ -3,8 +3,7 @@
 */
 
 // Get kayboard value from analogic signal and return key
-int getKeyValue()
-{
+int getKeyValue(){
   int val = 0;
   val = analogRead(keypadPin);
   //Serial.println(val);
