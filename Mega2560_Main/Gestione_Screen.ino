@@ -26,7 +26,6 @@ void Screen::checkScreenBeckLight(int keyPad, byte noTouch) {
 
 //Turning On or Turning Off the selected rele and show them on screen
 void Screen::manageReleSymbolAndAction(int index, int onOff) {
-  if (index < 4) {
     if (onOff == 0){ 
       digitalWrite(rele[index], LOW);
       releSymbol[index] = 1;
@@ -34,14 +33,6 @@ void Screen::manageReleSymbolAndAction(int index, int onOff) {
       digitalWrite(rele[index], HIGH);
       releSymbol[index] = 0;
     }
-  }else{
-    switch(index){
-      case 6: if(onOff == 0){ manualSendingEC = true;} break;
-      case 7: if(onOff == 0){ manualSendingPH = true;} break;
-      case 8: if(onOff == 0){ manualSendingTemperature = true;} break;
-      default: break;
-    }
-  }
 }
 
 void Screen::releSymbolMenu(){

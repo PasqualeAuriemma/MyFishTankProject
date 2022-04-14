@@ -15,6 +15,12 @@ class Screen {
     byte freqUpdateWebECIndex = 0;
 
     byte freqUpdateWebPHIndex = 0;
+	
+	bool manualSendingPH = false;
+	
+	bool manualSendingTemperature = false;
+	
+	bool manualSendingEC = false;
 
     bool monitorEC = false;
     
@@ -139,7 +145,17 @@ class Screen {
           showYesOrNoSelection1(colItem, rowItemManualMenu, manualMenu);
           if (keyPad == okButton) {
             waitingActionMenu();
-            manageReleSymbolAndAction(rowItemManualMenu, colItem);
+			if (rowItemManualMenu < 4) {
+				manageReleSymbolAndAction(rowItemManualMenu, colItem);
+			  }else{
+				switch(rowItemManualMenu){
+				  case 6: if(colItem == 0){ setManualSendingTemperature(true);} break;
+				  case 7: if(colItem == 0){ setManualSendingEC(true);} break;
+				  case 8: if(colItem == 0){ setManualSendingPH(true);} break;
+				  default: break;
+				}
+			  }
+         
             exitFromMenu();
             return setMenuAndChangingPage(true, false);
           } else {
@@ -492,7 +508,19 @@ class Screen {
     bool getConnectionShow(){ return connectionShow;}
 
     void setMonitorPH(bool value){ this->monitorPH = value;}
+	
+	void setManualSendingEC(bool value){ this->manualSendingEC = value;}
+	
+	bool getManualSendingEC(){ return manualSendingEC;}
+	
+	void setManualSendingTemperature(bool value){ this->manualSendingTemperature = value;}
+	
+	bool getManualSendingTemperature(){ return manualSendingTemperature;}
+	
+	void setManualSendingPH(bool value){ this->manualSendingPH = value;}
 
+    bool getManualSendingPH(){ return manualSendingPH;}
+	
     bool getMonitorPH(){ return monitorPH;}
 
     void setActiveMenu(byte value){ this->activeMenu = value;}

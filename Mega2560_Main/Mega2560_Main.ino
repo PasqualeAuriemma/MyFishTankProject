@@ -20,7 +20,7 @@
 #define DS18B20_Pin  42
 #define PH_PIN A2
 #define SD_PIN 53
-#define TdsSensorPin A1
+#define TdsSensorPin A7
 #define VREF 5.00// analog reference voltage(Volt) of the ADC
 #define SCOUNT 30 // sum of sample point
 const byte keypadPin = A0;
@@ -48,11 +48,11 @@ Screen *screen;
    gnd alimentazione board
    -----------------I ANALOGICI-----------------------------------
    A0 Tasti keypad
-   A1 TDS-EC Meter v 1.0 KS0429
+   A7 TDS-EC Meter v 1.0 KS0429
    A2 PH
    A3 LIBERO
-   A4 SDA I2C RTC
-   A5 SCL IC2 RTC
+   SDA I2C RTC
+   SCL IC2 RTC
 */
 
 //-----------------------------------------------------------------------------------------------------------
@@ -173,19 +173,19 @@ void setup() {
   Wire.begin();
   
   RTC.begin();
-//  if (! RTC.begin()) {
-//    Serial.println("Couldn't find RTC");
-//    while (1);
-//  }
-//
-//  if (RTC.lostPower()) {
-//    Serial.println("RTC lost power, lets set the time!");
-//    // following line sets the RTC to the date & time this sketch was compiled
-//    RTC.adjust(DateTime(F(__DATE__), F(__TIME__)));
-//    // This line sets the RTC with an explicit date & time, for example to set
-//    // January 21, 2014 at 3am you would call:
-//    // rtc.adjust(DateTime(2014, 1, 21, 3, 0, 0));
-//  }
+  if (! RTC.begin()) {
+    Serial.println("Couldn't find RTC");
+    while (1);
+  }
+
+  if (RTC.lostPower()) {
+    Serial.println("RTC lost power, lets set the time!");
+    // following line sets the RTC to the date & time this sketch was compiled
+    RTC.adjust(DateTime(F(__DATE__), F(__TIME__)));
+    // This line sets the RTC with an explicit date & time, for example to set
+    // January 21, 2014 at 3am you would call:
+    // rtc.adjust(DateTime(2014, 1, 21, 3, 0, 0));
+  }
   //RTC.adjust(DateTime(__DATE__, __TIME__));
   
   // Calling Oled constructor with okButton in input to know 
@@ -243,22 +243,27 @@ void loop() {
   if (config.onOffLightAuto) {
      manageAquariumLights(H, M);
   }
+
+  //Getting changingPageature if it is enabled
+  if (config.onOffTemperature) {
+    temperature = getTemp();
+  }
   
   // Get EC monitoring values if it is selected by menu
   if(screen->getMonitorEC()){
-    ec = getEC(temperature);
+    ec = getEC(int(temperature));
     screen -> showMonitoring(keyEC, ec, temperature); 
   }  
   
   // Sending EC values to web page if it is selected by menu
-  if(manualSendingEC){
+  if(screen->getManualSendingEC()){
     sendValueToWeb(ec, keyEC, now); 
-    manualSendingEC = false;
+    screen->getManualSendingEC();
   }  
   
 //  // Get PH monitoring values if it is selected by menu
   if(screen->getMonitorPH()){
-    phFinal = getPH(temperature);
+    phFinal = getPH(int(temperature));
     screen -> showMonitoring(keyPh, phFinal, temperature);
   }
 
@@ -267,15 +272,15 @@ void loop() {
   }
 
   // Sending PH values to web page if it is selected by menu
-  if(manualSendingPH){
+  if(screen->getManualSendingPH()){
     sendValueToWeb(phFinal, keyPh, now); 
-    manualSendingPH = false;
-  }  
+    screen->setManualSendingPH(false);
+  }
 
   // Sending Temperature values to web page if it is selected by menu
-  if(manualSendingTemperature){
+  if(screen->getManualSendingTemperature()){
     sendValueToWeb(temperature, keyTemp, now); 
-    manualSendingTemperature = false;
+    screen->setManualSendingTemperature(false);
   }  
 
   //Get EC values automatically only when it is the right time to get it
