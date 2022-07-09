@@ -1,6 +1,6 @@
 <?php 
   // function used to add record with button inside temp_tab
-  include("connection.php");
+    include("php/connection.php");
 
   if(!empty($_POST)){
     $temp = $_POST["temp"];

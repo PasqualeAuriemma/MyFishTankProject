@@ -1,612 +1,810 @@
-<!DOCTYPE HTML>
-<!--
-	Escape Velocity by HTML5 UP
-	html5up.net | @ajlkn
-	Free for personal and commercial use under the CCA 3.0 license (html5up.net/license)
--->
-<html>
-	<head>
-		<title>PIA12 FISH TANK - AQUARIUM</title>
-        <link rel="icon" type="image/png" href="/images/salmon.png">
-		<meta charset="utf-8" />
-		<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
-		<link rel="stylesheet" href="assets/css/main14.css" />
-        <link href="assets/css/bootstrap5.0.1.min.css" rel="stylesheet"  crossorigin="anonymous">
-        <link rel="stylesheet" type="text/css" href="assets/css/datatables-1.10.25.min.css"/>
-        
-        <style type="text/css">
-           
-           div.dataTables_wrapper {
-              width: 100%;
-              margin: 0 auto;
-           }
-           table, th, td {
-              border: 1px solid black;
-              border-collapse: collapse;
+<?php
+    session_start();
+?>
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <title>PIA12 FISH TANK - AQUARIUM</title>
+    <!-- plugins:css -->
+    <link rel="stylesheet" href="assets/vendors/mdi/css/materialdesignicons.min.css">
+    <link rel="stylesheet" href="assets/vendors/css/vendor.bundle.base.css">
+    
+    <!-- endinject -->
+    <!-- Plugin css for this page -->
+    <link rel="stylesheet" href="assets/vendors/jvectormap/jquery-jvectormap.css">
+    <link rel="stylesheet" href="assets/vendors/flag-icon-css/css/flag-icon.min.css">
+    <link rel="stylesheet" href="assets/vendors/owl-carousel-2/owl.carousel.min.css">
+    <link rel="stylesheet" href="assets/vendors/owl-carousel-2/owl.theme.default.min.css">
+
+
+    <!-- End plugin css for this page -->
+    <!-- inject:css -->
+    <!-- endinject -->
+    <!-- Layout styles -->
+    <link rel="stylesheet" href="//code.jquery.com/ui/1.13.1/themes/base/jquery-ui.css">
+    <link rel="stylesheet" href="assets/css/style.css">
+    <!-- End layout styles -->
+    <link rel="shortcut icon" href="assets/images/salmon.png" />
+    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.20/css/jquery.dataTables.min.css"/>
+    <style>
+       .form-control:focus{border-color: #1010d1; color: #c6c6e6;  box-shadow: none; -webkit-box-shadow: none;} 
+       .has-error .form-control:focus{box-shadow: none; -webkit-box-shadow: none;}
+       table, th, td {
+          text-align: center;
+       }
+       .ui-widget {
+            font-family: Verdana,Arial,sans-serif;
+            font-size: .8em;
+       }
+
+       .ui-widget-content {
+           background: #000000;
+           border: 1px solid #000000;
+           color: #222222;
+       }
+
+       .ui-dialog {
+           left: 0;
+           outline: 0 none;
+           padding: 0 !important;
+           position: absolute;
+           width: 100%,
+           top: 0;
+       }
+
+       #success {
+           padding: 0;
+           margin: 0; 
+       }
+
+       .ui-dialog .ui-dialog-content {
+           background: none repeat scroll 0 0 transparent;
+           border: 0 none;
+           overflow: auto;
+           position: relative;
+           padding: 0 !important;
+           background: #000000;
+       }
+
+       .ui-widget-header {
+           background: #434a54;
+           border: 0;
+           color: #fff;
+           font-weight: normal;
+       }
+
+       .ui-dialog .ui-dialog-titlebar {
+           padding: 0.1em .5em;
+           position: relative;
+           font-size: 1em;
+       }
+    </style>
+    
+    <?php
+          function calculate_median($arr) {
+            $count = count($arr); //total numbers in array
+            $middleval = floor(($count-1)/2); // find the middle value, or the lowest middle value
+            if($count % 2) { // odd number, middle is the median
+              $median = $arr[$middleval];
+            } else { // even number, calculate avg of 2 medians
+              $low = $arr[$middleval];
+              $high = $arr[$middleval+1];
+              $median = (($low+$high)/2);
             }
-        </style>
-        <?php
-          include("connection.php");
+            return $median;
+          }
+          
+          function calculate_average($arr) {
+            $count = count($arr); //total numbers in array
+            foreach ($arr as $value) {
+              $total = $total + $value; // total value of array numbers
+            }
+            $average = ($total/$count); // get average value
+            return $average;
+          }
+          
+          include("assets/js/php/connection.php");
           if ($con->connect_error) {
             die("Connection failed: " . $con->connect_error);
           }
-          $sqlT = "SELECT temperature, data_send as send FROM my_myfishtank.temp_tab ORDER BY data_send DESC limit 1";
-          $sqlEC = "SELECT ec, data_send as send FROM my_myfishtank.ec_tab ORDER BY data_send DESC limit 1";
-          //$sqlTDS = "SELECT tds, data_send as send FROM my_myfishtank.tds_tab ORDER BY data_send DESC limit 1";
-          $sqlPH = "SELECT ph, data_send as send FROM my_myfishtank.ph_tab ORDER BY data_send DESC limit 1";
-
+          $dataNow1 = date('Y-m-d');  
+          $sqlT = "SELECT temperature, FROM_UNIXTIME(data_send, '%Y-%m-%d') as send_t FROM my_myfishtank.temp_tab WHERE FROM_UNIXTIME(data_send, '%Y-%m-%d') = '$dataNow1' ORDER BY data_send";
+          $sqlEC = "SELECT ec, FROM_UNIXTIME(data_send, '%Y-%m-%d') as send_e FROM my_myfishtank.ec_tab WHERE FROM_UNIXTIME(data_send, '%Y-%m-%d') = '$dataNow1' ORDER BY data_send";
+          $sqlPH = "SELECT ph, FROM_UNIXTIME(data_send, '%Y-%m-%d') as send_p FROM my_myfishtank.ph_tab WHERE FROM_UNIXTIME(data_send, '%Y-%m-%d') = '$dataNow1' ORDER BY data_send";
+             
           $resultT = $con->query($sqlT);
           $resultEC = $con->query($sqlEC);
-          //$resultTDS = $conn->query($sqlTDS);
           $resultPH = $con->query($sqlPH);
-
+          
+          $t_array = array();
           if ($resultT->num_rows > 0) {
             // output data of each row
             while($rowT = $resultT->fetch_assoc()) {
-              $temperature = $rowT["temperature"];
-              $sendT = $rowT["send"];
+              $t_array[] = $rowT["temperature"];
+              $sendT = $rowT["send_t"];
             }
           } else {
-            $temperature = 0;
+            $t_array[] = 0;
             $sendT = "no data";
           }
-
+          $temperature = number_format(calculate_average($t_array), 2);
+          
+          $ec_array = array();
           if ($resultEC->num_rows > 0) {
             // output data of each row
             while($rowEC = $resultEC->fetch_assoc()) {
-              $ec = $rowEC["ec"];
-              $sendEC = $rowEC["send"];
+              $ec_array[] = $rowEC["ec"];
+              $sendEC = $rowEC["send_e"];
             }
           } else {
-            $ec = 0;
+            $ec_array[] = 0;
             $sendEC = "no data";
           }
-
-          //if ($resultTDS->num_rows > 0) {
-          // output data of each row
-          //while($rowTDS = $resultTDS -> fetch_assoc()) {
-          //  $tds = $rowTDS["tds"];
-          //  $sendTDS = $rowTDS["send"];
-          //}
-          //} else {
-          //$tds = 0;
-          //$sendTDS = "no data";
-          //}
-
+          $ec = number_format( calculate_median($ec_array), 2);
+          
+          $ph_array = array();
           if ($resultPH->num_rows > 0) {
             // output data of each row
             while($rowPH = $resultPH->fetch_assoc()) {
-              $ph = $rowPH["ph"];
-              $sendPH = $rowPH["send"];
+              $ph_array[] = $rowPH["ph"];
+              $sendPH = $rowPH["send_p"];
             }
           } else {
-            $ph = 0;
+            $ph_array[] = 0;
             $sendPH = "no data";
           }
-
+          $ph = number_format(calculate_median($ph_array), 2);
+          
           $con->close();
-        ?>
-	</head>
-  	<body class="homepage is-preload">
-    	<div id="page-wrapper">
-      	    <!-- Header -->
-      		<section id="header" class="wrapper">
-              <!-- Logo -->
-              <div id="logo">
-                  <h1><a href="index.php">AQUARIUM PIA12</a></h1>
-                  <p>The easy way to manage your fish tank</p>
-              </div>
-              <!-- Nav -->
-              <!--<nav id="nav">
-                  <ul>
-                      <li class="current"><a href="index.html">Home</a></li>
-                      <li><a href="#">Measurements</a>
-                          <ul>
-                              <li><a href="temperature.php">Temperature</a></li>
-                              <li><a href="ph.txt">PH</a></li>
-                              <li><a href="ec.php">EC</a></li>
-                              <li><a href="tds.php">TDS</a></li>
-                          </ul>
-                      </li>
-                      <li><a href="left-sidebar.html">Left Sidebar</a></li>
-                      <li><a href="right-sidebar.html">Right Sidebar</a></li>
-                      <li><a href="no-sidebar.html">Contatti</a></li>
-                  </ul>
-              </nav>-->
-          	</section>
-          	<!-- Intro -->
-          	<section id="intro" class="wrapper-carousel style1">
-              <div class="container">
-                  <div class="carousel" data-flickity='{ "wrapAround": true, "autoPlay": true, "imagesLoaded":true }'>
-                      <div class="carousel-cell">
-                          <img class="w3-image" src="images\acquarium.jpg">
-                      </div>
-                      <div class="carousel-cell">
-                          <img class="w3-image" src="images\acquarium1.jpg">
-                      </div>
-                      <div class="carousel-cell">
-                          <img class="w3-image" src="images\acquarium2.jpg">
-                      </div>
-                      <div class="carousel-cell">
-                          <img class="w3-image" src="images\acquarium4.jpg">
-                      </div>
-                      <div class="carousel-cell">
-                          <img class="w3-image" src="images\riallestimento0.jpg">
-                      </div>
-                  </div>
-              </div>
-          	</section>
-          	<!-- DashBoard -->        
-          	<section id="highlights" class="wrapper style1">
-              <div class="title">Monitoring</div>
-              <div class="container"> 
-                  <div class="row aln-center">
-                      <div class="col-4 col-12-medium">
-                          <section class="highlight">
-                              <center><p class="style4"> Recorded on <?php echo gmdate("l jS \of F Y", $sendT). " at ".gmdate("H:i:s", $sendT);?></p></center>
-                              <div class="container_chart">
-                                  <div class="row_chart">        
-                                      <div id="chart_temp"></div>
-                                  </div>
-                              </div>    
-                              <center><ul class="actions">
-                                  <li><a href="temperature.php" class="button style3">More Details</a></li>
-                              </ul></center>		
-                          </section>
-                      </div>	
-                      <div class="col-4 col-12-medium">
-                          <section class="highlight">
-                              <center> <p class="style4"> Recorded on <?php echo gmdate("l jS \of F Y", $sendEC). " at ".gmdate("H:i:s", $sendEC);?></p></center>
-                              <div class="container_chart">
-                                  <div class="row_chart">
-                                      <div id="chart_ec"></div>
-                                  </div>
-                              </div>
-                              <center><ul class="actions" >
-                                  <li><a href="tds_ec.php" class="button style3">More Details</a></li>
-                              </ul></center>  
-                          </section>
-                      </div>
-                      <div class="col-4 col-12-medium">
-                          <section class="highlight">
-                              <center><p class="style4"> Recorded on <?php echo gmdate("l jS \of F Y", $sendPH). " at ".gmdate("H:i:s", $sendPH);?></p></center>
-                              <div class="container_chart">
-                                  <div class="row_chart">
-                                      <div id="chart_ph"></div>
-                                  </div>
-                              </div>
-                              <center><ul class="actions" >
-                                  <li><a href="ph.php" class="button style3">More Details</a></li>
-                              </ul></center>  
-                          </section>
-                      </div>
-                  </div>    
-              </div>
-          	</section>
-          	<!-- Main -->
-          	<section id="main" class="wrapper style5">
-			  <div class="title">Water Values</div>
-              <div class="container">
+    ?>
+    
+</head>
+
+<body class="sidebar-icon-only">
+    <div class="container-scroller">        
+        <!-- partial:partials/_sidebar.html -->
+        <nav class="sidebar sidebar-offcanvas" id="sidebar">
+            <?php if (!isset($_SESSION["email"]) || !isset($_SESSION["loggedIn"])) {?>
+            <?php }else{ ?>
+            <ul class="nav">  
+                <li class="nav-item nav-category">
+                    <span class="nav-link">Navigation</span>
+                </li>
+                <li class="nav-item menu-items">
+                    <a class="nav-link" href="index.php">
+                        <span class="menu-icon">
+                           <i class="mdi mdi-speedometer"></i>
+                        </span>
+                        <span class="menu-title">Dashboard</span>
+                    </a>
+                </li>
+                <li class="nav-item menu-items">
+                    <a class="nav-link" href="diary.php">
+                        <span class="menu-icon">
+                          <i class="mdi mdi-table-large"></i>
+                        </span>
+                        <span class="menu-title">Diary</span>
+                    </a>
+                </li>
+                <li class="nav-item menu-items">
+                    <a class="nav-link" data-bs-toggle="collapse" href="#ui-basic" aria-expanded="false" aria-controls="ui-basic">
+                        <span class="menu-icon">
+                        <i class="mdi mdi-laptop"></i>
+                      </span>
+                        <span class="menu-title">Basic UI Elements</span>
+                        <i class="menu-arrow"></i>
+                    </a>
+                    <div class="collapse" id="ui-basic">
+                        <ul class="nav flex-column sub-menu">
+                            <li class="nav-item"> <a class="nav-link" href="pages/ui-features/buttons.html">Buttons</a></li>
+                            <li class="nav-item"> <a class="nav-link" href="pages/ui-features/dropdowns.html">Dropdowns</a></li>
+                            <li class="nav-item"> <a class="nav-link" href="pages/ui-features/typography.html">Typography</a></li>
+                        </ul>
+                    </div>
+                </li>
+                <li class="nav-item menu-items">
+                    <a class="nav-link" href="pages/forms/basic_elements.html">
+                        <span class="menu-icon">
+                <i class="mdi mdi-playlist-play"></i>
+              </span>
+                        <span class="menu-title">Form Elements</span>
+                    </a>
+                </li>
+                <li class="nav-item menu-items">
+                    <a class="nav-link" href="pages/tables/basic-table.html">
+                        <span class="menu-icon">
+                          <i class="mdi mdi-table-large"></i>
+                        </span>
+                        <span class="menu-title">Tables</span>
+                    </a>
+                </li>
+                <li class="nav-item menu-items">
+                    <a class="nav-link" href="pages/charts/chartjs.html">
+                        <span class="menu-icon">
+                <i class="mdi mdi-chart-bar"></i>  
+              </span>
+                        <span class="menu-title">Charts</span>
+                    </a>
+                </li>
+                <li class="nav-item menu-items">
+                    <a class="nav-link" href="pages/icons/mdi.html">
+                        <span class="menu-icon">
+                <i class="mdi mdi-contacts"></i>
+              </span>
+                        <span class="menu-title">Icons</span>
+                    </a>
+                </li>
+                <li class="nav-item menu-items">
+                    <a class="nav-link" data-bs-toggle="collapse" href="#auth" aria-expanded="false" aria-controls="auth">
+                        <span class="menu-icon">
+                <i class="mdi mdi-security"></i>
+              </span>
+                        <span class="menu-title">User Pages</span>
+                        <i class="menu-arrow"></i>
+                    </a>
+                    <div class="collapse" id="auth">
+                        <ul class="nav flex-column sub-menu">
+                            <li class="nav-item"> <a class="nav-link" href="pages/samples/blank-page.html"> Blank Page </a></li>
+                            <li class="nav-item"> <a class="nav-link" href="pages/samples/error-404.html"> 404 </a></li>
+                            <li class="nav-item"> <a class="nav-link" href="pages/samples/error-500.html"> 500 </a></li>
+                            <li class="nav-item"> <a class="nav-link" href="pages/samples/login.html"> Login </a></li>
+                            <li class="nav-item"> <a class="nav-link" href="pages/samples/register.html"> Register </a></li>
+                        </ul>
+                    </div>
+                </li>
+                <li class="nav-item menu-items">
+                    <a class="nav-link" href="http://www.bootstrapdash.com/demo/corona-free/jquery/documentation/documentation.html">
+                        <span class="menu-icon">
+                <i class="mdi mdi-file-document-box"></i>
+              </span>
+                        <span class="menu-title">Documentation</span>
+                    </a>
+                </li>
+            </ul>
+            <?php } ?>
+        </nav>
         
-                <table id="waterValuesTable" class="table" style="width:100%">
-                   	<thead>
-                       	<th>Data</th>
-                        <th>Nitriti</th>
-                        <th>Nitrati</th>
-                        <th>GH</th>
-                        <th>KH</th>
-                        <th>Fosfati</th>
-                        <th>Options</th>
-					</thead>
-					<tbody>
-					</tbody>
-				</table>
-                <left>  
-              		<a href="#!" data-id="" data-bs-toggle="modal" data-bs-target="#addWVModal" class="btn btn-success btn-sm" >Add Values</a>	
-               	</left>  
-              </div>
-          	</section> 
-          	<!-- Main -->
-          	<section id="main" class="wrapper style4">
-              <div class="title">Fertilization Diary</div>
-              <div class="container">
-                <table id="fertilizationTable" class="table" style="width:100%">
-                   	<thead>
-                       	<th>Data</th>
-                        <th>Potassio ml</th>
-                        <th>Magnesio ml</th>
-                        <th>Ferro ml</th>
-                        <th>Rinverdente ml</th>
-                        <th>Fosforo ml</th>
-						<th>Stick NPK</th>
-                        <th>Options</th>
-					</thead>
-					<tbody>
-					</tbody>
-				</table>
-                <left>  
-              		<a href="#!" data-id="" data-bs-toggle="modal" data-bs-target="#addFertilizationModal"   class="btn btn-success btn-sm" >Add Quantities</a>
-               	</left>  
-              </div>
-          	</section>        
-          	<!-- Footer -->
-          	<section id="footer" class="wrapper">
-              <div class="container">
-                  <div class="row">
-                      <div class="col-6 col-12-medium">
-                          <!-- Contact -->
-                          <section class="feature-list small">
-                              <div class="row">
-                                  <div class="col-6 col-12-small">
-                                      <section>
-                                          <h3 class="icon solid fa-comment">Social</h3>
-                                          <p>
-                                            <a href="https://github.com/PasqualeAuriemma/MyFishTankProject">Github</a><br />
-                                            <a href="https://www.linkedin.com/in/pasquale-auriemma-780953b8/">LinkedIn</a><br />
-                                            <a href="https://it.altervista.org/">Altervista</a>
-                                          </p>
-                                      </section>
-                                  </div>
-                                  <div class="col-6 col-12-small">
-                                      <section>
-                                          <h3 class="icon solid fa-envelope">Email</h3>
-                                          <p>
+        <!-- partial -->
+        <div class="container-fluid page-body-wrapper">
+            <!-- partial:partials/_navbar.html -->
+            <nav class="navbar p-0 fixed-top d-flex flex-row">
+                <div class="navbar-menu-wrapper flex-grow d-flex align-items-stretch">
+                     <?php if (!isset($_SESSION["email"]) || !isset($_SESSION["loggedIn"])) {?>
+                     <?php }else{ ?>
+                      <button class="navbar-toggler navbar-toggler align-self-center" type="button" data-toggle="minimize">
+                      <span class="mdi mdi-menu"></span>
+                      </button>
+                    <?php } ?>
+                    <ul class="navbar-nav navbar-nav-right">
+                        <li class="nav-item dropdown">
+                            <a class="nav-link" id="profileDropdown" href="#" data-bs-toggle="dropdown">
+                                <div class="navbar-profile">
+                                    <button class="btn btn-outline-primary btn-rounded btn-icon" id="opener">
+                                        <i class= "mdi mdi-water text-primary"></i><!-- <i class="mdi mdi-pulse"></i>
+                                        <i class= "mdi mdi-stethoscope"></i>-->
+                                    </button>   
+                                </div>
+                            </a>
+                        </li>
+                        <li class="nav-item dropdown">
+                            <a class="nav-link" id="profileDropdown" href="#" data-bs-toggle="dropdown">
+                                <div class="navbar-profile">
+                                    <button class="btn btn-outline-success btn-rounded btn-icon" id="openFertilization">
+                                        <i class="mdi mdi-eyedropper text-success"></i><!--<i class="mdi mdi-book-open-variant"></i>
+                                         <i class="mdi mdi-cup-water"></i>-->
+                                    </button>
+                                </div>
+                            </a>
+                        </li>
+                        <li class="nav-item dropdown">
+                            <a class="nav-link" id="profileDropdown" href="#" data-bs-toggle="dropdown">
+                                <div class="navbar-profile">
+                                    <button class="btn btn-outline-danger btn-rounded btn-icon" id="openVolumes">
+                                        <i class="mdi mdi-battery-60 text-danger"></i><!-- <i class="mdi mdi-tune"></i>
+                                        <i class="mdi mdi-chart-bar"></i> -->
+                                    </button>
+                                 </div>
+                            </a>    
+                        </li>
+                        
+                        <li class="nav-item dropdown">
+                            <a class="nav-link" id="profileDropdown" href="#" data-bs-toggle="dropdown">
+                                <div class="navbar-profile">
+                                    <img class="img-xs rounded-circle" src="assets/images/faces/salmon.jpg" alt="">
+                                    <p class="mb-0 d-none d-sm-block navbar-profile-name">AQUARIUM PIA12</p>
+                                    <i class="mdi mdi-menu-down d-none d-sm-block"></i>
+                                </div>
+                            </a>
+                            <div class="dropdown-menu dropdown-menu-right navbar-dropdown preview-list" aria-labelledby="profileDropdown">
+                                <?php if (!isset($_SESSION["email"]) || !isset($_SESSION["loggedIn"])) {?>
+                                <?php }else{ ?>
+                                <h6 class="p-3 mb-0">Options</h6>
+                                <div class="dropdown-divider"></div>
+                               
+                                <a class="dropdown-item preview-item" href="settings.php">
+                                    <div class="preview-thumbnail">
+                                        <div class="preview-icon bg-dark rounded-circle">
+                                            <i class="mdi mdi-settings text-info"></i>
+                                        </div>
+                                    </div>
+                                    <div class="preview-item-content">
+                                          <p class="preview-subject mb-1">Settings</p>
+                                    </div>     
+                                </a>
+                                <?php } ?>
+                                <div class="dropdown-divider"></div>
+                                <?php if (!isset($_SESSION["email"]) || !isset($_SESSION["loggedIn"])) {?>
+                                  <a class="dropdown-item preview-item" href="login_db.php" data-id="" data-bs-toggle="modal" data-bs-target="#loginModal">
+                                      <div class="preview-thumbnail">
+                                          <div class="preview-icon bg-dark rounded-circle">
+                                              <i class="mdi mdi-login text-success"></i>
+                                          </div>
+                                      </div>
+                                      <div class="preview-item-content">
+                                          <p class="preview-subject mb-1">Login In</p>
+                                      </div>
+                                  </a>
+                                <?php }else{ ?>
+                                  <a class="dropdown-item preview-item" id="logout">
+                                      <div class="preview-thumbnail">
+                                          <div class="preview-icon bg-dark rounded-circle">
+                                              <i class="mdi mdi-logout text-danger"></i>
+                                          </div>
+                                      </div>
+                                      <div class="preview-item-content">
+                                          <p class="preview-subject mb-1">Log out</p>
+                                      </div>
+                                  </a>
+                                <?php } ?>
+                            </div>
+                        </li>
+                    </ul>
+                    <?php if (!isset($_SESSION["email"]) || !isset($_SESSION["loggedIn"])) {?>
+                    <?php }else{ ?>
+                      <button class="navbar-toggler navbar-toggler-right d-lg-none align-self-center" type="button" data-toggle="offcanvas">
+                        <span class="mdi mdi-format-line-spacing"></span>
+                      </button>
+                    <?php } ?>
+                </div>
+            </nav>
+            <!-- partial -->
+            <div class="main-panel">
+                <div class="content-wrapper">
+
+                    <div class="row">
+                        <div class="col-md-3 grid-margin stretch-card">
+                            <div class="card">
+                                <!--<div class="card-body"></div>-->
+                            </div>
+                        </div>
+                        <div class="col-md-6 grid-margin stretch-card">
+                            <div class="card">
+                                <div class="card-body">
+                                    <h1 class="card-title">MyFishTank</h1>
+                                    <div class="owl-carousel owl-theme full-width owl-carousel-dash portfolio-carousel" id="owl-carousel-basic">
+                                        <div class="item">
+                                            <img src="assets/images/dashboard/acquarium.jpg" alt="">
+                                        </div>
+                                        <div class="item">
+                                            <img src="assets/images/dashboard/acquarium1.jpg" alt="">
+                                        </div>
+                                        <div class="item">
+                                            <img src="assets/images/dashboard/acquarium2.jpg" alt="">
+                                        </div>
+                                        <div class="item">
+                                            <img src="assets/images/dashboard/acquarium4.jpg" alt="">
+                                        </div>
+                                        <div class="item">
+                                            <img src="assets/images/dashboard/riallestimento0.jpg" alt="">
+                                        </div>
+                                        <div class="item">
+                                            <img src="assets/images/dashboard/riallestimento2.jpg" alt="">
+                                        </div>
+                                        <div class="item">
+                                            <img src="assets/images/dashboard/riallestimento3.jpg" alt="">
+                                        </div> 
+                                        <div class="item">
+                                            <img src="assets/images/dashboard/riallestimento4.jpg" alt="">
+                                        </div>
+                                        <div class="item">
+                                            <img src="assets/images/dashboard/riallestimento5.jpg" alt="">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3 grid-margin stretch-card">
+                            <div class="card">
+                            <!--
+                                <div>
+                                  <center>
+                                    <button class="btn btn-inverse-primary btn-rounded btn-icon" id="opener">
+                                        <i class="mdi mdi-pulse"></i><i class= "mdi mdi-stethoscope"></i>
+                                        <i class= "mdi mdi-water"></i>
+                                    </button>   
+                                    <button class="btn btn-inverse-success btn-rounded btn-icon" id="openFertilization">
+                                        <i class="mdi mdi-eyedropper"></i><i class="mdi mdi-book-open-variant"></i>
+                                        <i class="mdi mdi-cup-water"></i>
+                                    </button>
+                                    <button class="btn btn-inverse-danger btn-rounded btn-icon" id="openVolumes">
+                                        <i class="mdi mdi-tune"></i><i class="mdi mdi-battery-60"></i>
+                                        <i class="mdi mdi-chart-bar"></i>
+                                    </button>
+                                   </center> 
+                                </div>
+                            -->
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-sm-4 grid-margin">
+                            <div class="card">
+                                <div class="card-body">
+                                    <h5>EC</h5>
+                                    <div class="row">
+                                        <div id="chart_ec" align='center'></div>
+                                        <h6 class="text-muted font-weight-normal"> <?php echo $sendEC;?></h6>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-sm-4 grid-margin">
+                            <div class="card">
+                                <div class="card-body">
+                                    <div class="row">
+                                      <h5>PH</h5> 
+                                    </div>
+                                    <div class="row">
+                                        <div id="chart_ph" align='center'></div>
+                                        <h6 class="text-muted font-weight-normal"><?php echo $sendPH;?></h6>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-sm-4 grid-margin">
+                            <div class="card">
+                                <div class="card-body">
+                                    <h5>Temperature</h5>
+                                    <div class="row">
+                                        <div id="chart_temp" align='center'></div>
+                                        <h6 class="text-muted font-weight-normal"><?php echo $sendT;?></h6>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!--<div class="row">
+                        <div class="col-md-5 col-xl-4 grid-margin stretch-card">
+                            <div class="card">
+
+                            </div>
+                        </div>
+                        <div class="col-md-5 col-xl-4 grid-margin stretch-card">
+                            <div class="card">
+
+                            </div>
+                        </div>
+                        <div class="col-md-5 col-xl-4 grid-margin stretch-card">
+                            <div class="card">
+                            </div>
+                        </div>
+                    </div>-->
+                    <?php
+                    	$dataNow = date('Y-m-d'); 
+                    ?>
+                    <div class="row">
+                        <div class="col-md-4 grid-margin stretch-card">
+                            <div class="card">
+                                <div class="card-body">
+                                    <h4 class="card-title">EC History</h4>
+                                    <p>
+                                        <input type="text" name="datepicker_ec" id="datepicker_ec" placeholder="<?php echo "$dataNow" ?>" />
+                                        <input type="button" name="filter_ec" id="filter_ec" value="Filter" class="btn btn-info" />
+                                    </p>
+                                    <div class="table-responsive" style="hight: 100%;">
+                                        <table id="table_id" class="table" style="width:100%;">
+                                          <thead>
+                                          <tr>
+                                            <th>ID</th>
+                                            <th>Time</th>
+                                            <th>EC</th>
+                                          </tr>
+                                          </thead>
+                                          <?php if (!isset($_SESSION["email"]) || !isset($_SESSION["loggedIn"])) {?>
+                                                        
+                                          <?php }else{ ?> 
+                                            <tfoot>
+                                                <tr>
+                                                    <th></th>
+                                                    <th><a href="#!" data-id="'.$row['id'].'" class="btn btn-primary addConductivity" ><i class="mdi mdi-table-row-plus-after"></i></a></th>
+                                                    <th><input type="number" step="any" class="form-control" id="addECField" name="po4"></th>
+                                                </tr>
+                                            </tfoot>
+                                        <?php } ?>     
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-8 grid-margin stretch-card">
+                            <div class="card">
+                                <div class="card-body" style="hight: 100%;">
+                                    <canvas id="areaChartEC" style="hight: 100%;" ></canvas>
+                                    <center>
+                                      <button type="button" id="changeEC7D" class="btn btn-primary btn-sm">7 Days</button>
+                                      <button1 type="button" class="btn btn-primary btn-sm" id="changeEC1M">1 Month</button1>
+                                      <button2 type="button" class="btn btn-primary btn-sm" id="changeEC2M">2 Months</button2>
+                                      <button3 type="button" class="btn btn-primary btn-sm" id="changeECALL">All</button3>
+                                    </center>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-4 grid-margin stretch-card">
+                            <div class="card">
+                                <div class="card-body">
+                                    <h4 class="card-title">PH History</h4>
+                                    <p>
+                                        <input type="text" name="datepicker_ph" id="datepicker_ph" placeholder="<?php echo "$dataNow" ?>" />
+                                        <input type="button" name="filter_ph" id="filter_ph" value="Filter" class="btn btn-info" />
+                                    </p>
+                                    <div class="table-responsive" style="hight: 100%;">
+                                        <table id="ph_history" class="table " style="width:100%;">
+                                          <thead>
+                                          <tr>
+                                            <th>ID</th>
+                                            <th>Time</th>
+                                            <th>Ph</th>
+                                          </tr>
+                                          </thead>
+                                          <tbody>
+                                          </tbody>
+                                          <?php if (!isset($_SESSION["email"]) || !isset($_SESSION["loggedIn"])) {?>
+                                                        
+                                          <?php }else{ ?> 
+                                            <tfoot>
+                                                <tr>
+                                                    <th></th>
+                                                    <th><a href="#!" data-id="'.$row['id'].'" class="btn btn-primary addPH" ><i class="mdi mdi-table-row-plus-after"></i></a></th>
+                                                    <th><input type="number" step="any" class="form-control" id="addPHFieldP" name="addPHFieldP"></th>
+                                                </tr>
+                                             </tfoot>
+                                          <?php } ?>  
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-8 grid-margin stretch-card">
+                            <div class="card">
+                                <div class="card-body">
+                                    <canvas id="areaChartPH" style="height:250px"></canvas>
+                                    <center> 
+                                      <button type="button" id="changePH7D" class="btn btn-primary btn-sm">7 Days</button>
+                                      <button1 type="button" class="btn btn-primary btn-sm" id="changePH1M">1 Month</button1>
+                                      <button2 type="button" class="btn btn-primary btn-sm" id="changePH2M">2 Months</button2>
+                                      <button3 type="button" class="btn btn-primary btn-sm" id="changePHALL">All</button3>
+                                    </center>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-4 grid-margin stretch-card">
+                            <div class="card">
+                                <div class="card-body">
+                                    <h4 class="card-title">TEMPERATURE History</h4>
+                                    <p>
+                                        <input type="text" name="datepicker_t" id="datepicker_t" placeholder="<?php echo "$dataNow" ?>" />
+                                        <input type="button" name="filter_t" id="filter_t" value="Filter" class="btn btn-info" />
+                                    </p>
+                                    <div class="table-responsive" style="hight: 100%;">
+                                        <table id="temperature_history" class="table"style="width:100%">
+                                          <thead>
+                                          <tr>
+                                            <th>ID</th>
+                                            <th>Time</th>
+                                            <th>Temperature</th>
+                                          </tr>
+                                          </thead>
+                                          <?php if (!isset($_SESSION["email"]) || !isset($_SESSION["loggedIn"])) {?>
+                                                        
+                                          <?php }else{ ?> 
+                                            <tfoot>
+                                                <tr>
+                                                    <th></th>
+                                                    <th><a href="#!" data-id="'.$row['id'].'" class="btn btn-primary addTemperature" ><i class="mdi mdi-table-row-plus-after"></i></a></th>
+                                                    <th><input type="number" step="any" class="form-control" id="addTField" name="temperature"></th>
+                                                </tr>
+                                            </tfoot>
+                                          <?php } ?> 
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-8 grid-margin stretch-card">
+                            <div class="card">
+                                <div class="card-body">
+                                    <canvas id="areaChartT"> </canvas>
+                                    <center>
+                                      <button type="button" id="changeT7D" class="btn btn-primary btn-sm">7 Days</button>
+                                      <button1 type="button" class="btn btn-primary btn-sm" id="changeT1M">1 Month</button1>
+                                      <button2 type="button" class="btn btn-primary btn-sm" id="changeT2M">2 Months</button2>
+                                      <button3 type="button" class="btn btn-primary btn-sm" id="changeTALL">All</button3>
+                                    </center>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- content-wrapper ends -->
+                <!-- partial:partials/_footer.html -->
+                <footer class="footer">
+                  <div class="content-wrapper">
+                    <div class="row">
+                        <div class="col-sm-4 grid-margin">
+                        	<section>
+                                <h3 class="icon solid fa-comment">Social</h3>
+                                <center><p>
+                                  <a href="https://github.com/PasqualeAuriemma/MyFishTankProject">Github</a><br />
+                                  <a href="https://www.linkedin.com/in/pasquale-auriemma-780953b8/">LinkedIn</a><br />
+                                  <a href="https://it.altervista.org/">Altervista</a>
+                                </p></center>
+                        	</section>
+                        </div>
+                        <div class="col-sm-4 grid-margin">
+                        	<section>
+                            	<h3 class="icon solid fa-envelope">Email</h3>
+                                	<center>
+                                    	<p>
                                             <a href="#">info@untitled.tld</a>
-                                          </p>
-                                      </section>
-                                  </div>
-                              </div>
-                          </section>
-                      </div>
-                  </div>
-                  <div id="copyright">
-                      <a rel="license" href="http://creativecommons.org/licenses/by/4.0/"><img alt="Licenza Creative Commons" style="border-width:0" src="https://i.creativecommons.org/l/by/4.0/88x31.png" /></a>
-                      <br />Quest'opera è distribuita con Licenza <a rel="license" href="http://creativecommons.org/licenses/by/4.0/">Creative Commons Attribuzione 4.0 Internazionale</a>.            
-                  </div>
-              </div>
-          	</section>
-		</div>
-    	<!-- Optional JavaScript; choose one of the two! -->
-		<!-- Option 1: Bootstrap Bundle with Popper -->
-		<script src="assets/js/jquery-3.6.0.min.js"  crossorigin="anonymous"></script>
-		<script src="assets/js/bootstrap.bundle.min.js"  crossorigin="anonymous"></script>
-		<script type="text/javascript" src="assets/js/dt-1.10.25datatables.min.js"></script>
-		<!-- Option 2: Separate Popper and Bootstrap JS -->
-    	<!--
-    	<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js" integrity="sha384-IQsoLXl5PILFhosVNubq5LC7Qb9DXgDA9i+tQ8Zj3iwWAwPtgFTxbJ8NT4GN1R8p" crossorigin="anonymous"></script>
-    	<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.1/dist/js/bootstrap.min.js" integrity="sha384-Atwg2Pkwv9vp0ygtn1JAojH0nYbwNJLPhwyoVbhoPwBhjQPR5VtM2+xf0Uwh9KtT" crossorigin="anonymous"></script>
-  		-->    
-        <script type="text/javascript">
-        	$(document).ready(function() {
-      			$('#fertilizationTable').DataTable({
-        			"fnCreatedRow": function( nRow, aData, iDataIndex ) {
-          				$(nRow).attr('id', aData[0]);},
-                    "scrollX": true,
-                    "pageLength": 5,
-                    "lengthMenu": [ [5, 10, 25, 50, -1], [5, 10, 25, 50, "All"] ],
-                    'serverSide':'true',
-                    'processing':'true',
-                    'paging':'true',
-                    'order':[],
-                    'ajax': {
-                      'url':'Fertilization/fetch_quantities.php',
-                      'type':'post',
+                                        </p>
+                                    </center>
+                        	</section>
+                        </div>
+                        <div class="col-sm-4 grid-margin">
+                        	<div id="copyright">
+                            	<span class="text-muted d-block text-center text-sm-left d-sm-inline-block"> <a rel="license" href="http://creativecommons.org/licenses/by/4.0/"><img alt="Licenza Creative Commons" style="border-width:0" src="https://i.creativecommons.org/l/by/4.0/88x31.png" /></a></span>
+                            	<span class="float-none float-sm-right d-block mt-1 mt-sm-0 text-center">Quest'opera è distribuita con Licenza <a rel="license" href="http://creativecommons.org/licenses/by/4.0/">Creative Commons Attribuzione 4.0 Internazionale</a>.</span>
+                      		</div>
+                        </div>   
+                    </div>                     
+                  </div>  
+                </footer>
+                <!-- partial -->
+            </div>
+            <!-- main-panel ends -->
+        </div>
+        <!-- page-body-wrapper ends -->
+    </div>
+    <!-- container-scroller -->
+
+
+    <!-- plugins:js -->
+    <script src="assets/vendors/js/vendor.bundle.base.js"></script>
+    <!-- endinject -->
+    <!-- Plugin js for this page -->
+    
+    
+    <script src="assets/vendors/chart.js/Chart.min.js"></script>
+    <script src="assets/vendors/progressbar.js/progressbar.min.js"></script>
+    <script src="assets/vendors/jvectormap/jquery-jvectormap.min.js"></script>
+    <script src="assets/vendors/jvectormap/jquery-jvectormap-world-mill-en.js"></script>
+    <script src="assets/vendors/owl-carousel-2/owl.carousel.min.js"></script>
+    <script src="assets/js/jquery.cookie.js" type="text/javascript"></script>
+    <script type="text/javascript" src="https://www.google.com/jsapi"></script>
+    <!--<script src="assets/js/data-picker.js"></script>-->
+    <!--<script type="text/javascript" charset="utf8" src="https://code.jquery.com/jquery-3.3.1.js"></script> -->
+    <script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/1.10.20/js/jquery.dataTables.min.js"></script>
+
+    <script src="https://code.jquery.com/ui/1.13.1/jquery-ui.js"></script>
+
+    <!-- End plugin js for this page -->
+    <!-- inject:js -->
+    <script src="assets/js/off-canvas.js"></script>
+    <script src="assets/js/hoverable-collapse.js"></script>
+    <script src="assets/js/misc.js"></script>
+    <script src="assets/js/settings.js"></script>
+    <script src="assets/js/todolist.js"></script>
+    <!-- endinject -->
+    <!-- Custom js for this page -->
+    <script src="assets/js/dashboard.js"></script>
+    
+    <script src="ec_chart.js"></script>
+    <script src="ph_chart.js"></script>
+    <script src="t_chart.js"></script>
+    <script src="dayHistoryValuesTableManaging.js"></script>
+    <script src="dayHistoryValuesAdding.js"></script>
+
+    <script src="fertilizationTable.js"></script>
+    <script src="waterValuesTable.js"></script>
+    
+    <script type="text/javascript">
+    	$(document).ready(function () {
+            $("#login").on('click', function() {
+            	var email = $("#email").val();
+                var password = $("#password").val();
+                $.ajax(	
+                {
+                    url: 'login_db.php',
+                    method: 'POST',
+                    data: {
+                        login: 1, 
+                        emailPHP: email,
+                        passwordPHP: password
+                          },
+                    success: function(response) {
+                    	console.log(response);
+                         $('#loginModal').modal('hide');
+                         location.reload(true);
                     },
-                    "columnDefs": [{
-                      'target':[5],
-                      'orderable' :false,
-                    }]
-                });
-    		});
-			$(document).on('submit','#addQuantities',function(e){
-      			e.preventDefault();
-                var key= $('#addKeyQField').val();
-                var k= $('#addKField').val();
-                var mg= $('#addMgField').val();
-                var fe= $('#addFeField').val();
-                var rinverdente = $('#addRinverdenteField').val();
-                var p= $('#addPField').val();
-                var npk= $('#addNPKField').val();
-                if (key == "Pia12"){
-                       $.ajax({
-                         url:"Fertilization/add_quantities.php",
-                         type:"post",
-                         data:{potassio:k, magnesio:mg, ferro:fe, rinverdente:rinverdente, fosforo:p, npk:npk},
-                         success:function(data){
-                           var json = JSON.parse(data);
-                           var status = json.status;
-                           if(status=='true'){
-                            mytable =$('#fertilizationTable').DataTable();
-                            mytable.draw();
-                            $('#addFertilizationModal').modal('hide');
-                            var frm = document.getElementsByName('addQuantities')[0];
-                            frm.reset();  // Reset all form data
-                           }else{
-                            alert('failed');
-                           }
-                         }
-                      });
-    			}else{
-                   
-      				alert('Key wrong');
-    			}
-  			});
-			$(document).on('submit','#updateQuantities',function(e){
-      			e.preventDefault();
-                //var tr = $(this).closest('tr');
-                var key= $('#keyQField').val();
-                var k= $('#kField').val();
-                var mg= $('#mgField').val();
-                var fe= $('#feField').val();
-                var rinverdente= $('#rinverdenteField').val();
-                var p= $('#pField').val();
-                var npk= $('#npkField').val();
-                var trid= $('#tridQ').val();
-                var id= $('#idQ').val();
-                var date= $('#dateQ').val();
-                if (key == "Pia12"){
-                       $.ajax({
-                         url:"Fertilization/update_quantities.php",
-                         type:"post",
-                         data:{potassio:k, magnesio:mg, ferro:fe, rinverdente:rinverdente, fosforo:p, npk:npk, id:id},
-                         success:function(data){
-                           var json = JSON.parse(data);
-                           var status = json.status;
-                           if(status=='true'){
-                            table =$('#fertilizationTable').DataTable();
-                            // table.cell(parseInt(trid) - 1,0).data(id);
-                            // table.cell(parseInt(trid) - 1,1).data(username);
-                            // table.cell(parseInt(trid) - 1,2).data(email);
-                            // table.cell(parseInt(trid) - 1,3).data(mobile);
-                            // table.cell(parseInt(trid) - 1,4).data(city);
-                            var button =   '<td><a href="javascript:void();" data-id="' +id + '" class="btn btn-info btn-sm editbtnF">Edit</a>  <a href="#!"  data-id="' +id + '"  class="btn btn-danger btn-sm deleteBtnF">Delete</a></td>';
-                            var row = table.row("[id='"+trid+"']");
-                             var dateClass = new Date(date)
-                            var dateFormat = dateClass.getDate()+"/"+(dateClass.getMonth()+1)+"/"+dateClass.getFullYear()
-                            row.row("[id='" + trid + "']").data([dateFormat, k, mg, fe, rinverdente, p, npk, button]);
-                            $('#updateFertilizationModal').modal('hide');
-                           }else{
-                            alert('failed');
-                           }
-                         }
-                       });
-      			}else{
-      				alert('Key wrong');
-    			}
-    		});
-    		$('#fertilizationTable').on('click','.editbtnF ',function(event){
-              var table = $('#fertilizationTable').DataTable();
-              var trid = $(this).closest('tr').attr('id');
-              // console.log(selectedRow);
-              var id = $(this).data('id');
-              $('#updateFertilizationModal').modal('show');
-              $.ajax({
-                url:"Fertilization/get_single_quantity.php",
-                data:{id:id},
-                type:'post',
-                success:function(data){
-                 var json = JSON.parse(data);
-                 $('#kField').val(json.k);
-                 $('#mgField').val(json.mg);
-                 $('#feField').val(json.fe);
-                 $('#rinverdenteField').val(json.rinverdente);
-                 $('#pField').val(json.p);
-                 $('#npkField').val(json.npk);
-                 $('#idQ').val(id);
-                 $('#dateQ').val(json.data);
-                 $('#tridQ').val(trid);
+                    dataType: 'text'
                 }
-   			  })
-   			});
-			$(document).on('click','.deleteBtnF',function(event){
-       			var table = $('#fertilizationTable').DataTable();
-      			event.preventDefault();
-                var id = $(this).data('id');
-                if(confirm("Are you sure want to delete this quantities? ")){
-                  $.ajax({
-                    url:"Fertilization/delete_quantities.php",
-                    data:{id:id},
-                    type:"post",
-                    success:function(data){
-                      var json = JSON.parse(data);
-                      status = json.status;
-                      if(status=='success'){
-                        //table.fnDeleteRow( table.$('#' + id)[0] );
-                         $("#fertilizationTable tbody").find(id).remove();
-                         //table.row($(this).closest("tr")) .remove();
-                         //$("#"+id).closest('tr').remove();
-                         table.draw();
-                      }else{
-                        alert('Failed');
-                        return;
-                      }
-                    }
-                  });
-                }else{
-              		return null;
-            	}
-          	})
-        </script>
-        <script type="text/javascript">
-			$(document).ready(function() {
-      			$('#waterValuesTable').DataTable({
-        			"fnCreatedRow": function( nRow, aData, iDataIndex ) {
-          				$(nRow).attr('id', aData[0]);},
-                    "scrollX": true,
-                    "pageLength": 5,
-                    "lengthMenu": [ [5, 10, 25, 50, -1], [5, 10, 25, 50, "All"] ],
-                    'serverSide':'true',
-                    'processing':'true',
-                    'paging':'true',
-                    'order':[],
-                    'ajax': {
-                      'url':'waterValuesDirectory/fetch_data.php',
-                      'type':'post',
+              );    
+            });
+            $("#logout").on('click', function() {
+                $.ajax(	
+                {
+                    url: 'logout_db.php',
+                    method: 'POST',
+                    data: {
+                        login: 0, 
+                          },
+                    success: function(response) {
+                    	console.log(response);
+                        location.reload(true);
                     },
-                    "columnDefs": [{
-                      'target':[5],
-                      'orderable' :false,
-                    }]
-                });
-    		});
-    		$(document).on('submit','#addUser',function(e){
-      			e.preventDefault();
-                var key= $('#addKeyField').val();
-                var no2= $('#addNo2Field').val();
-                var no3= $('#addNo3Field').val();
-                var gh= $('#addGHField').val();
-                var kh= $('#addKHField').val();
-                var po4= $('#addPo4Field').val();
-                if (key == "Pia12"){
-                    $.ajax({
-                      url:"waterValuesDirectory/add_user.php",
-                      type:"post",
-                      data:{no2:no2, no3:no3, gh:gh, kh:kh, po4:po4},
-                      success:function(data){
-                        var json = JSON.parse(data);
-                        var status = json.status;
-                        if(status=='true'){
-                          mytable =$('#waterValuesTable').DataTable();
-                          mytable.draw();
-                          $('#addWVModal').modal('hide');
-                          var frm = document.getElementsByName('addUser')[0];
-                          frm.reset();  // Reset all form data
-                        }else{
-                          alert('failed');
-                        }
-                      }
-                    });
-    			}else{
-      				alert('Key wrong');
-    			}
-  			});
-    		$(document).on('submit','#updateUser',function(e){
-      			e.preventDefault();
-                //var tr = $(this).closest('tr');
-                var key= $('#keyField').val();
-                var no2= $('#no2Field').val();
-                var no3= $('#no3Field').val();
-                var gh= $('#ghField').val();
-                var kh= $('#khField').val();
-                var po4= $('#po4Field').val();
-                var trid= $('#trid').val();
-                var id= $('#id').val();
-                var date= $('#date').val();
-                if (key == "Pia12"){
-                	//if(no2 != '' && no3 != '' && gh != '' && kh != '' ) {
-                       $.ajax({
-                         url:"waterValuesDirectory/update_user.php",
-                         type:"post",
-                         data:{no2:no2, no3:no3, gh:gh, kh:kh, po4:po4, id:id},
-                         success:function(data){
-                           var json = JSON.parse(data);
-                           var status = json.status;
-                           if(status=='true'){
-                            table =$('#waterValuesTable').DataTable();
-                            // table.cell(parseInt(trid) - 1,0).data(id);
-                            // table.cell(parseInt(trid) - 1,1).data(username);
-                            // table.cell(parseInt(trid) - 1,2).data(email);
-                            // table.cell(parseInt(trid) - 1,3).data(mobile);
-                            // table.cell(parseInt(trid) - 1,4).data(city);
-                            var button =   '<td><a href="javascript:void();" data-id="' +id + '" class="btn btn-info btn-sm editbtn">Edit</a>  <a href="#!"  data-id="' +id + '"  class="btn btn-danger btn-sm deleteBtn">Delete</a></td>';
-                            var row = table.row("[id='"+trid+"']");
-                            var dateClass = new Date(date)
-                            var dateFormat = dateClass.getDate()+"/"+(dateClass.getMonth()+1)+"/"+dateClass.getFullYear()
-                            row.row("[id='" + trid + "']").data([dateFormat, no2, no3, gh, kh, po4, button]);
-                            $('#updateVWModal').modal('hide');
-                           }else{
-                            alert('failed');
-                           }
-                         }
-                       });
-                    //}else{
-        			//   alert('Fill all the required fields');
-       			    //}
-      			}else{
-      				alert('Key wrong');
-    			}
-    		});
-    		$('#waterValuesTable').on('click','.editbtn ',function(event){
-              var table = $('#waterValuesTable').DataTable();
-              var trid = $(this).closest('tr').attr('id');
-              // console.log(selectedRow);
-              var id = $(this).data('id');
-              $('#updateVWModal').modal('show');
-              $.ajax({
-                url:"waterValuesDirectory/get_single_data.php",
-                data:{id:id},
-                type:'post',
-                success:function(data){
-                 var json = JSON.parse(data);
-                 $('#no2Field').val(json.no2);
-                 $('#no3Field').val(json.no3);
-                 $('#ghField').val(json.gh);
-                 $('#khField').val(json.kh);
-                 $('#po4Field').val(json.po4);
-                 $('#id').val(id);
-                 $('#date').val(json.data);
-                 $('#trid').val(trid);
+                    dataType: 'text'
                 }
-   			  })
-   			});
-    		$(document).on('click','.deleteBtn',function(event){
-       			var table = $('#waterValuesTable').DataTable();
-      			event.preventDefault();
-                var id = $(this).data('id');
-                if(confirm("Are you sure want to delete this values?")){
-                  $.ajax({
-                    url:"waterValuesDirectory/delete_user.php",
-                    data:{id:id},
-                    type:"post",
-                    success:function(data){
-                      var json = JSON.parse(data);
-                      status = json.status;
-                      if(status=='success'){
-                        //table.fnDeleteRow( table.$('#' + id)[0] );
-                         $("#waterValuesTable tbody").find(id).remove();
-                         //table.row($(this).closest("tr")) .remove();
-                         //$("#"+id).closest('tr').remove();
-                         table.draw();
-                      }else{
-                        alert('Failed');
-                        return;
-                      }
-                    }
-                  });
-                }else{
-              		return null;
-            	}
-          	})
-        </script>
-    	<!-- Scripts 
-    	<script src="sito/assets/js/jquery.min.js"></script>-->
-    <script src="assets/js/jquery.dropotron.min.js"></script>
-    <script src="assets/js/browser.min.js"></script>
-    <script src="assets/js/breakpoints.min.js"></script>
-    <script src="assets/js/util.js"></script>
-    <!-- <script src="sito/assets/js/main.js"></script> -->
-    <!-- oppure <script src="https://unpkg.com/flickity@2/dist/flickity.pkgd.min.js"></script> -->
-    <script src="assets\js\flickity.pkgd.min.js"></script>
-        <script type="text/javascript" src="https://www.google.com/jsapi"></script>
-        <script type="text/javascript">
-          google.load('visualization', '1', {packages: ['corechart', 'gauge']});
-          google.charts.setOnLoadCallback(drawChart);
+              );    
+            });
+        });
+    </script>
 
-          function drawChart() {
+    <script>
+          google.charts.load('current', {'packages':['gauge', 'corechart']});
+          //google.load('visualization', '1', {packages: ['corechart', 'gauge']});
+          google.charts.setOnLoadCallback(drawCharts);
 
-            var dataTemp = google.visualization.arrayToDataTable([
-              ['Label', 'Value'],
-              ['Gradi °', <?php echo $temperature;?>],
-            ]);
+          function drawCharts() {
 
-            //var dataTDS = google.visualization.arrayToDataTable([
-            //    ['Label', 'Value'],
-            //    ['ppm', <?php //echo $tds;?>],
-            //]);
-
+           var w = $(window).width();
+            var x = Math.floor(w * 0.23);
+            //console.log("width: " + w + ", x = " + x);
+            var h = $(window).height();
+            var y = Math.floor(h * 0.3);
+            //console.log("height: " + h + ", y = " + y);
+            
             var dataEC = google.visualization.arrayToDataTable([
                 ['Label', 'Value'],
                 ['µS/cm', <?php echo $ec;?>],
+            ]);
+             var optionsEC = {
+                yellowFrom: 600, yellowTo: 820,
+                redFrom: 820, redTo: 1000,
+                minorTicks: 10,
+                max: 1000,
+                height: y,
+                width: x
+            };   
+            
+            var chartE = new google.visualization.Gauge(document.getElementById('chart_ec'));
+            
+            chartE.clearChart();
+            chartE.draw(dataEC, optionsEC);
+            
+            var dataTemp = google.visualization.arrayToDataTable([
+              ['Label', 'Value'],
+              ['Gradi °', <?php echo $temperature;?>],
             ]);
 
             var dataPH = google.visualization.arrayToDataTable([
@@ -614,14 +812,7 @@
                 ['pH', <?php echo $ph;?>],
             ]);
 
-            var w = $(window).width();
-            var x = Math.floor(w * 0.3);
-            //console.log("width: " + w + ", x = " + x);
-            var h = $(window).height();
-            var y = Math.floor(h * 0.3);
-            //console.log("height: " + h + ", y = " + y);
-
-            var options = {
+           var options = {
                 yellowFrom: 28, yellowTo: 34,
                 redFrom: 34, redTo: 45,
                 minorTicks: 5,
@@ -629,24 +820,6 @@
                 height: y,
                 width: x
             };
-
-             //var optionsTDS = {
-             //   yellowFrom: 500, yellowTo: 550,
-             //   redFrom: 550, redTo: 650,
-             //   minorTicks: 10,
-             //   max: 650,
-             //   height: y,
-             //   width: x
-             //}; 
-
-            var optionsEC = {
-                yellowFrom: 600, yellowTo: 820,
-                redFrom: 820, redTo: 1000,
-                minorTicks: 10,
-                max: 1000,
-                height: y,
-                width: x
-            }; 
 
             var optionsPH = {
                 yellowFrom: 0, yellowTo: 6.5,
@@ -657,273 +830,333 @@
                 height: y,
                 width: x
             };
+              
+            var chartT = new google.visualization.Gauge(document.getElementById('chart_temp'));
 
-            function resize() {    
+            var chartP = new google.visualization.Gauge(document.getElementById('chart_ph'));
+                chartT.clearChart();
+                chartT.draw(dataTemp, options);
+              
+                chartP.clearChart();
+                chartP.draw(dataPH, optionsPH);
+           
+        }
+          
+        //create trigger to resizeEnd event     
+        function resize () {
+            var w = $(window).width();
+            var x = Math.floor(w * 0.23);
+            //console.log("width: " + w + ", x = " + x);
+            var h = $(window).height();
+            var y = Math.floor(h * 0.3);
+            //console.log("height: " + h + ", y = " + y);
+            
+            var dataEC = google.visualization.arrayToDataTable([
+                ['Label', 'Value'],
+                ['µS/cm', <?php echo $ec;?>],
+            ]);
+             var optionsEC = {
+                yellowFrom: 600, yellowTo: 820,
+                redFrom: 820, redTo: 1000,
+                minorTicks: 10,
+                max: 1000,
+                height: y,
+                width: x
+            };   
+            
+            var chartE = new google.visualization.Gauge(document.getElementById('chart_ec'));
+            
+            chartE.clearChart();
+            chartE.draw(dataEC, optionsEC);
+            
+            var dataTemp = google.visualization.arrayToDataTable([
+              ['Label', 'Value'],
+              ['Gradi °', <?php echo $temperature;?>],
+            ]);
+            
+            var dataPH = google.visualization.arrayToDataTable([
+                ['Label', 'Value'],
+                ['pH', <?php echo $ph;?>],
+            ]);
+
+           var options = {
+                yellowFrom: 28, yellowTo: 34,
+                redFrom: 34, redTo: 45,
+                minorTicks: 5,
+                max: 45,
+                height: y,
+                width: x
+            };
+
+         
+            var optionsPH = {
+                yellowFrom: 0, yellowTo: 6.5,
+                greenFrom: 6.5, greenTo: 8,
+                redFrom: 8, redTo: 12,
+                minorTicks: 0,
+                max: 12,
+                height: y,
+                width: x
+            };
+              
               var chartT = new google.visualization.Gauge(document.getElementById('chart_temp'));
-              var chartE = new google.visualization.Gauge(document.getElementById('chart_ec'));
-              //var chartS = new google.visualization.Gauge(document.getElementById('chart_tds'));
+
               var chartP = new google.visualization.Gauge(document.getElementById('chart_ph'));
               chartT.clearChart();
               chartT.draw(dataTemp, options);
-              chartE.clearChart();
-              chartE.draw(dataEC, optionsEC);
-              //chartS.clearChart();
-              //chartS.draw(dataTDS, optionsTDS);
+              
               chartP.clearChart();
               chartP.draw(dataPH, optionsPH);
+        }
+
+        window.onload = resize;
+        window.onresize = resize;
+    </script> 
+       
+    <!-- End custom js for this page -->
+    <script>
+      function showVolumes() {
+        try {
+          // Opera 8.0+, Firefox, Safari
+          var xmlhttp = new XMLHttpRequest();
+        }catch (e) {
+          // Internet Explorer Browsers
+          try {
+            var xmlhttp = new ActiveXObject("Msxml2.XMLHTTP");
+          }catch (e) {
+            try{
+              var xmlhttp = new ActiveXObject("Microsoft.XMLHTTP");
+            }catch (e){
+              // Something went wrong
+              alert("Your browser broke!");
+              return false;
             }
-            window.onload = resize();
-            window.onresize = resize;
           }
-        </script> 
-        <!-- Modal -->
-        <div class="modal fade" id="updateVWModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-  			<div class="modal-dialog">
-    			<div class="modal-content">
-      				<div class="modal-header">
-        				<h5 class="modal-title" id="exampleModalLabel">Update Values</h5>
-        				<button7 type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button7>
-      				</div>
-  				    <div class="modal-body">
-        				<form id="updateUser" >
-          					<input type="hidden" name="id" id="id" value="">
-                            <input type="hidden" name="date" id="date" value="">
-          					<input type="hidden" name="trid" id="trid" value="">
-                            <div class="mb-3 row">
-            					<label for="keyField" class="col-md-3 form-label">Key</label>
-            					<div class="col-md-9">
-              						<input type="password" class="form-control" id="keyField" name="key" >
-            					</div>
-          					</div>
-          					<div class="mb-3 row">
-            					<label for="no2Field" class="col-md-3 form-label">Nitriti</label>
-            					<div class="col-md-9">
-              						<input type="number" step="any" class="form-control" id="no2Field" name="nitriti" >
-            					</div>
-          					</div>
-          					<div class="mb-3 row">
-            					<label for="no3Field" class="col-md-3 form-label">Nitrati</label>
-            					<div class="col-md-9">
-              						<input type="number" step="any" class="form-control" id="no3Field" name="nitrati">
-            					</div>
-          					</div>
-          					<div class="mb-3 row">
-            					<label for="ghField" class="col-md-3 form-label">GH</label>
-            					<div class="col-md-9">
-              						<input type="number" step="any" class="form-control" id="ghField" name="gh">
-            					</div>
-          					</div>
-          					<div class="mb-3 row">
-            					<label for="khField" class="col-md-3 form-label">KH</label>
-            					<div class="col-md-9">
-              						<input type="number" step="any" class="form-control" id="khField" name="kh">
-           						</div>
-          					</div>
-                            <div class="mb-3 row">
-            					<label for="po4Field" class="col-md-3 form-label">Fosfati</label>
-            					<div class="col-md-9">
-              						<input type="number" step="any" class="form-control" id="po4Field" name="fosfati">
-           						</div>
-          					</div>
-          					<div class="text-center">
-            					<button type="submit" class="btn btn-primary">Submit</button>
-          					</div>
-        				</form> 
-      				</div>
-      				<div class="modal-footer">
-        				<button type="button"  class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-      				</div>
-    			</div>
-  			</div>
-		</div>
-    	<!-- Add user Modal -->
-    	<div class="modal fade" id="addWVModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-  			<div class="modal-dialog">
-    			<div class="modal-content">
-      				<div class="modal-header">
-        				<h5 class="modal-title" id="exampleModalLabel">Add Values</h5>
-        				<button7 type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button7>
-      				</div>
-      				<div class="modal-body">
-        				<form id="addUser" name="addUser" action="">
-             				<div class="mb-3 row">
-            					<label for="addKeyField" class="col-md-3 form-label">Key</label>
-            					<div class="col-md-9">
-              						<input type="password" class="form-control" id="addKeyField" name="key" >
-            					</div>
-          					</div>
-          					<div class="mb-3 row">
-            					<label for="addNo2Field" class="col-md-3 form-label">Nitriti</label>
-            					<div class="col-md-9">
-              						<input type="number" step="any" class="form-control" id="addNo2Field" name="no2" >
-            					</div>
-          					</div>
-          					<div class="mb-3 row">
-            					<label for="addNo3Field" class="col-md-3 form-label">Nitrati</label>
-            					<div class="col-md-9">
-              						<input type="number" step="any" class="form-control" id="addNo3Field" name="no3">
-            					</div>
-          					</div>
-          					<div class="mb-3 row">
-            					<label for="addGHField" class="col-md-3 form-label">GH</label>
-            					<div class="col-md-9">
-              						<input type="number" step="any" class="form-control" id="addGHField" name="gh">
-            					</div>
-          					</div>
-          					<div class="mb-3 row">
-            					<label for="addKHField" class="col-md-3 form-label">KH</label>
-            					<div class="col-md-9">
-              						<input type="number" step="any" class="form-control" id="addKHField" name="kh">
-            					</div>
-          					</div>
-                            <div class="mb-3 row">
-            					<label for="addPo4Field" class="col-md-3 form-label">Fosfati</label>
-            					<div class="col-md-9">
-              						<input type="number" step="any" class="form-control" id="addPo4Field" name="po4">
-            					</div>
-          					</div>
-          					<div class="text-center">
-            					<button type="submit" class="btn btn-primary">Submit</button>
-          					</div>
-        				</form> 
-      				</div>
-     				<div class="modal-footer">
-        				<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-      				</div>
-    			</div>
-  			</div>
-		</div>  
-		<!-- Add Fertilization Modal -->
-    	<div class="modal fade" id="addFertilizationModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-  			<div class="modal-dialog">
-    			<div class="modal-content">
-      				<div class="modal-header">
-        				<h5 class="modal-title" id="exampleModalLabel">Add Quantities</h5>
-        				<button7 type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button7>
-      				</div>
-      				<div class="modal-body">
-        				<form id="addQuantities" name="addQuantities" action="">
-             				<div class="mb-3 row">
-            					<label for="addKeyQField" class="col-md-3 form-label">Key</label>
-            					<div class="col-md-9">
-              						<input type="password" class="form-control" id="addKeyQField" name="key" >
-            					</div>
-          					</div>
-          					<div class="mb-3 row">
-            					<label for="addKField" class="col-md-3 form-label">Potassio</label>
-            					<div class="col-md-9">
-              						<input type="number" step="any" class="form-control" id="addKField" name="potassio" >
-            					</div>
-          					</div>
-          					<div class="mb-3 row">
-            					<label for="addMgField" class="col-md-3 form-label">Magnesio</label>
-            					<div class="col-md-9">
-              						<input type="number" step="any" class="form-control" id="addMgField" name="magnesio">
-            					</div>
-          					</div>
-          					<div class="mb-3 row">
-            					<label for="addFeField" class="col-md-3 form-label">Ferro</label>
-            					<div class="col-md-9">
-              						<input type="number" step="any" class="form-control" id="addFeField" name="ferro">
-            					</div>
-          					</div>
-          					<div class="mb-3 row">
-            					<label for="addRinverdenteField" class="col-md-3 form-label">Rinverdente</label>
-            					<div class="col-md-9">
-              						<input type="number" step="any" class="form-control" id="addRinverdenteField" name="rinverdente">
-            					</div>
-          					</div>
-                            <div class="mb-3 row">
-            					<label for="addPField" class="col-md-3 form-label">Fosforo</label>
-            					<div class="col-md-9">
-              						<input type="number" step="any" class="form-control" id="addPField" name="fosforo">
-            					</div>
-          					</div>
-							<div class="mb-3 row">
-            					<label for="addNPKField" class="col-md-3 form-label">Stick NPK</label>
-            					<div class="col-md-9">
-              						<input type="number" step="any" class="form-control" id="addNPKField" name="npk">
-            					</div>
-          					</div>
-          					<div class="text-center">
-            					<button type="submit" class="btn btn-primary">Submit</button>
-          					</div>
-        				</form> 
-      				</div>
-     				<div class="modal-footer">
-        				<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-      				</div>
-    			</div>
-  			</div>
-		</div>
-        <!-- Modal Fertilization -->
-        <div class="modal fade" id="updateFertilizationModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-  			<div class="modal-dialog">
-    			<div class="modal-content">
-      				<div class="modal-header">
-        				<h5 class="modal-title" id="exampleModalLabel">Update Quantities</h5>
-        				<button7 type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button7>
-      				</div>
-  				    <div class="modal-body">
-        				<form id="updateQuantities" >
-          					<input type="hidden" name="idQ" id="idQ" value="">
-                            <input type="hidden" name="dateQ" id="dateQ" value="">
-          					<input type="hidden" name="tridQ" id="tridQ" value="">
-                            <div class="mb-3 row">
-            					<label for="keyQField" class="col-md-3 form-label">Key</label>
-            					<div class="col-md-9">
-              						<input type="password" class="form-control" id="keyQField" name="key" >
-            					</div>
-          					</div>
-          					<div class="mb-3 row">
-            					<label for="kField" class="col-md-3 form-label">Potassio</label>
-            					<div class="col-md-9">
-              						<input type="number" step="any" class="form-control" id="kField" name="potassio" >
-            					</div>
-          					</div>
-          					<div class="mb-3 row">
-            					<label for="mgField" class="col-md-3 form-label">Magnesio</label>
-            					<div class="col-md-9">
-              						<input type="number" step="any" class="form-control" id="mgField" name="magnesio">
-            					</div>
-          					</div>
-          					<div class="mb-3 row">
-            					<label for="feField" class="col-md-3 form-label">Ferro</label>
-            					<div class="col-md-9">
-              						<input type="number" step="any" class="form-control" id="feField" name="ferro">
-            					</div>
-          					</div>
-          					<div class="mb-3 row">
-            					<label for="rinverdenteField" class="col-md-3 form-label">Rinverdente</label>
-            					<div class="col-md-9">
-              						<input type="number" step="any" class="form-control" id="rinverdenteField" name="rinverdente">
-           						</div>
-          					</div>
-                            <div class="mb-3 row">
-            					<label for="pField" class="col-md-3 form-label">Fosforo</label>
-            					<div class="col-md-9">
-              						<input type="number" step="any" class="form-control" id="pField" name="fosforo">
-           						</div>
-          					</div>
-							<div class="mb-3 row">
-            					<label for="npkField" class="col-md-3 form-label">Stick NPK</label>
-            					<div class="col-md-9">
-              						<input type="number" step="any" class="form-control" id="npkField" name="npk">
-           						</div>
-          					</div>
-          					<div class="text-center">
-            					<button type="submit" class="btn btn-primary">Submit</button>
-          					</div>
-        				</form> 
-      				</div>
-      				<div class="modal-footer">
-        				<button type="button"  class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-      				</div>
-    			</div>
-  			</div>
-		</div>
-	</body>
+        }
+
+        xmlhttp.onreadystatechange = function() {
+           if (this.readyState == 4 && this.status == 200) {
+             document.getElementById("volumes").innerHTML = this.responseText;
+           }
+        };
+        xmlhttp.open("GET","getFertilizationVolumes.php",true);
+        xmlhttp.send();
+      }
+    </script>
+
+    
+    <script type="text/javascript">
+        var windowWidth = $(window).width();
+        var windowHeight = $(window).height();
+		$(document).ready( function() {
+			$( "#dialog" ).dialog({
+			  autoOpen: false,
+              position: { my: "center", at: "bottom" },
+              width: (windowWidth * 90 /100),
+              modal: true,
+              title: "Water Values", 
+			  show: {
+				effect: "blind",
+				duration: 1000
+			  },
+			  hide: {
+				effect: "explode",
+				duration: 1000
+			  }
+			});
+            
+            $("#FertilizationT").dialog({
+			  autoOpen: false,
+              width: (windowWidth * 90 /100),
+              position: { my: "center", at: "bottom" },
+              title: "Fertilization Diary", 
+			 
+              show: {
+				effect: "blind",
+				duration: 1000
+			  },
+			  hide: {
+				effect: "explode",
+				duration: 1000
+			  }
+			});
+            
+            $("#VolumesO").dialog({
+			  autoOpen: false,
+              modal: true,
+              position: { my: "center", at: "center" },
+              //buttons: {  
+              //    X: function() {$(this).dialog("close");}  
+              // },  
+              title: "Consumption of products",  
+              width: (windowWidth * 90 /100), 
+			  show: {
+				effect: "blind",
+				duration: 1000
+			  },
+			  hide: {
+				effect: "explode",
+				duration: 1000
+			  }
+			});
+		 
+			$("#opener").on("click", function() {
+			  $("#dialog").dialog("open").dialog('option', 'position', 'center');
+			});
+            $("#openFertilization").on("click", function() {
+			  $("#FertilizationT").dialog("open").dialog('option', 'position', 'center');
+			});
+            $("#openVolumes").on("click", function() {
+              showVolumes();
+			  $("#VolumesO").dialog("open").dialog('option', 'position', 'center');
+			});
+		});
+    </script>
+    
+
+<!-- Login Modal -->    
+    <div class="modal fade" id="loginModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+          <div class="modal-content">
+          	<div class="modal-header">
+                    <h3 class="card-title text-left mb-3">Login</h3>
+                    <button7 type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button7>
+            </div>
+            <div class="modal-body">         
+               <form action="index.php" method="post" id="loginForm">
+                 <div class="form-group">
+                    <input type="text" class="form-control p_input" placeholder="Username or email" id="email" required>
+                 </div>
+                 <div class="form-group">
+                    <input type="password" class="form-control p_input" placeholder="Password" id="password" required>
+                 </div>
+                 <div class="form-group d-flex align-items-center justify-content-between">
+                    <div class="form-check">
+                      <label class="form-check-label">
+                        <input type="submit" class="form-check-input"> Remember me </label>
+                    </div>
+                    <a href="#" class="forgot-pass">Forgot password</a>
+                 </div>
+                 <div class="text-center">
+                    <input type="button" class="btn btn-primary btn-block enter-btn" id="login" value="Log in">
+                 </div>
+                 <br />
+                 <div class="d-flex">
+                    <button class="btn btn-facebook me-2 col">
+                      <i class="mdi mdi-facebook"></i> Facebook </button>
+                    <button class="btn btn-google col">
+                      <i class="mdi mdi-google-plus"></i> Google plus </button>
+                 </div>
+                 <div class="modal-footer">
+                	  <p class="sign-up">Don't have an Account?<a href="#"> Sign Up</a></p> 
+                 </div>
+               </form>
+            </div>
+          </div>
+        </div>
+    </div>  
+    <div class="modal fade" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+		<div id="dialog" >
+			
+            	<div class="card-body">
+                  <div class="table-responsive">
+                      <table id="waterValuesTable" class="table table-bordered" style="width:100%;">
+                          <thead>
+                              <tr>
+                                  <th>Data</th>
+                                  <th>EC_PRE</th>
+                                  <th>EC_AFT</th>
+                                  <th>PH</th>
+                                  <th>Nitriti</th>
+                                  <th>Nitrati</th>
+                                  <th>GH</th>
+                                  <th>KH</th>
+                                  <th>Fosfati</th>
+                                  <th>Options</th>
+                              </tr>
+                          </thead>
+                          <tbody>
+                          </tbody>
+                          <?php if (!isset($_SESSION["email"]) || !isset($_SESSION["loggedIn"])) {?>
+
+                          <?php }else{ ?> 
+                            <tfoot>
+                                <tr>
+                                    <th></th>
+                                    <th><input type="number" step="any" class="form-control" id="addecPField" name="ecP"></th>
+                                    <th><input type="number" step="any" class="form-control" id="addecAField" name="ecA"></th>
+                                    <th><input type="number" step="any" class="form-control" id="addphField" name="ph"></th>
+                                    <th><input type="number" step="any" class="form-control" id="addNo2Field" name="no2"></th>
+                                    <th><input type="number" step="any" class="form-control" id="addNo3Field" name="no3"></th>
+                                    <th><input type="number" step="any" class="form-control" id="addGHField" name="gh"></th>
+                                    <th><input type="number" step="any" class="form-control" id="addKHField" name="kh"></th>
+                                    <th><input type="number" step="any" class="form-control" id="addPo4Field" name="po4"></th>
+                                    <th><a href="#!" data-id="'.$row['id'].'" class="btn btn-primary addBtn" ><i class="mdi mdi-table-row-plus-after"></i></a></th>      
+                                </tr>
+                            </tfoot>
+                          <?php } ?>
+                      </table>
+                  </div>
+        	    </div>
+            </div>
+		
+	</div>    
+    <div class="modal fade" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+		<div id="FertilizationT" >
+        	
+           		<div class="card-body">
+                  <div class="table-responsive">
+                      <table id="fertilizationTable" class="table table-bordered" style="width:100%;">
+                          <thead>
+                              <tr>
+                                  <th>Data</th>
+                                  <th>Potassio ml</th>
+                                  <th>Magnesio ml</th>
+                                  <th>Ferro ml</th>
+                                  <th>Rinverdente ml</th>
+                                  <th>Fosforo ml</th>
+                                  <th>Azoto ml</th>
+                                  <th>NPK</th>
+                                  <th>Options</th>
+                              </tr>
+                          </thead>
+                          <tbody>
+                          </tbody>
+                          <?php if (!isset($_SESSION["email"]) || !isset($_SESSION["loggedIn"])) {?>
+
+                          <?php }else{ ?>
+                            <tfoot>
+                              <tr>
+                                  <th></th>
+                                  <th><input type="number" step="any" class="form-control" id="addKField" name="potassio"></th>
+                                  <th><input type="number" step="any" class="form-control" id="addMgField" name="magnesio"></th>
+                                  <th><input type="number" step="any" class="form-control" id="addFeField" name="ferro"></th>
+                                  <th><input type="number" step="any" class="form-control" id="addRinverdenteField" name="rinverdente"></th>
+                                  <th><input type="number" step="any" class="form-control" id="addPField" name="fosforo"></th>
+                                  <th><input type="number" step="any" class="form-control" id="addNField" name="azoto"></th>
+                                  <th><input type="number" step="any" class="form-control" id="addNPKField" name="npk"></th>
+                                  <th><a href="#!" data-id="'.$row['id'].'" class="btn btn-primary addFertilizationBtn" ><i class="mdi mdi-table-row-plus-after"></i></a></th>
+                              </tr>
+                            </tfoot>
+                          <?php } ?>
+                      </table>
+                  </div>
+            	</div>
+            </div>
+		
+	</div>     
+    <div class="modal fade" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    	<div class="row ">
+        <div class="col-4 grid-margin">
+        <div class="card">
+        	<div class="card-body">
+        		<div id="VolumesO" >
+					<div id="volumes">
+                    </div>
+		        </div>
+            </div>
+        </div></div>
+</div>	</div>      
+</body>
+
 </html>
-<script type="text/javascript">
-  //var table = $('#waterValuesTable').DataTable();
-</script>

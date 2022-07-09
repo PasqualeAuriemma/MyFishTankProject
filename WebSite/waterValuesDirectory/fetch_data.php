@@ -1,4 +1,8 @@
-<?php include('connection.php');
+<?php
+
+session_start();
+
+include('connection.php');
 
 $output= array();
 $sql = "SELECT * FROM watervalues_table";
@@ -10,6 +14,9 @@ if(isset($_POST['search']['value']))
 {
 	$search_value = $_POST['search']['value'];
 	$sql .= " WHERE data like '%".$search_value."%'";
+    $sql .= " OR EC_PRE like '%".$search_value."%'";
+	$sql .= " OR EC_AFT like '%".$search_value."%'";
+	$sql .= " OR PH like '%".$search_value."%'";
 	$sql .= " OR no2 like '%".$search_value."%'";
 	$sql .= " OR no3 like '%".$search_value."%'";
 	$sql .= " OR gh like '%".$search_value."%'";
@@ -43,14 +50,23 @@ while($row = mysqli_fetch_assoc($query))
 	$sub_array = array();
 	//$sub_array[] = $row['id'];
 	$sub_array[] = date_format(date_create($row['data']),"d/m/Y");
+    $sub_array[] = $row['EC_PRE'];
+	$sub_array[] = $row['EC_AFT'];
+	$sub_array[] = $row['PH'];
 	$sub_array[] = $row['no2'];
 	$sub_array[] = $row['no3'];
 	$sub_array[] = $row['gh'];
     $sub_array[] = $row['kh'];
     $sub_array[] = $row['po4'];
-	$sub_array[] = '<a href="javascript:void();" data-id="'.$row['id'].'"  class="btn btn-info btn-sm editbtn" >Edit</a>  <a href="javascript:void();" data-id="'.$row['id'].'"  class="btn btn-danger btn-sm deleteBtn" >Delete</a>';
-	$data[] = $sub_array;
+    if (!isset($_SESSION["email"]) || !isset($_SESSION["loggedIn"])){
+    	$sub_array[] = '';      
+    }else{
+        $sub_array[] = '<a href="javascript:void();" data-id="'.$row['id'].'"  class="btn btn-info btn-sm editbtn" ><i class="mdi mdi-table-edit"></i></a>  <a href="javascript:void();" data-id="'.$row['id'].'"  class="btn btn-danger btn-sm deleteBtn" ><i class="mdi mdi-table-row-remove"></i></a>';      
+    }
+    $data[] = $sub_array;
 }
+
+
 
 $output = array(
 	'draw'=> intval($_POST['draw']),

@@ -1,6 +1,6 @@
 <?php 
   // function used to add record with button inside the ec_tab and tds_tab
-  include("connection.php");
+  include("php/connection.php");
 
   if(!empty($_POST)){
     $ec = $_POST["ec"];
