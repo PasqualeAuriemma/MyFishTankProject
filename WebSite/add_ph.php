@@ -1,6 +1,6 @@
 <?php 
   // function used to add record with button inside ph_tab
-  include("connection.php");
+  include("php/connection.php");
 
   if(!empty($_POST)){
     $ph = $_POST["ph"];
