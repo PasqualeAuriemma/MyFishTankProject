@@ -178,9 +178,6 @@ void Screen::saveMinMaxTemperature(byte *minAndMax) {
 }
 
 void Screen::saveFreqUpdateWeb() {
-  Serial.println(freqUpdateWebTemperatureIndex);
-  Serial.println(setFreq(freqUpdateWebTemperatureIndex));
-        
   config.freqUpdateWebTemperature = setFreq(freqUpdateWebTemperatureIndex);
   config.freqUpdateWebEC = setFreq(freqUpdateWebECIndex);
   config.freqUpdateWebPH = setFreq(freqUpdateWebPHIndex);
@@ -188,8 +185,6 @@ void Screen::saveFreqUpdateWeb() {
 }
 
 void Screen::freqNumberIndex(){
-  Serial.println(config.freqUpdateWebTemperature);
-  Serial.println(indexNumber(config.freqUpdateWebTemperature));
   freqUpdateWebTemperatureIndex = indexNumber(config.freqUpdateWebTemperature);
   freqUpdateWebECIndex = indexNumber(config.freqUpdateWebEC);
   freqUpdateWebPHIndex = indexNumber(config.freqUpdateWebPH);

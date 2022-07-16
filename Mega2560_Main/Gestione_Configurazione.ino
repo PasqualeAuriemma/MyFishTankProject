@@ -15,7 +15,7 @@ void loadConfiguration(const char *filename, Config &config) {
   // Deserialize the JSON document
   DeserializationError error = deserializeJson(doc, file);
   if (error) {
-    Serial.println(F("Failed to read file, using default configuration"));
+    Serial.println(F("Failed to read file, using default configuration in loadConfiguration!"));
     Serial.println(error.f_str());
     return;
   }
@@ -59,7 +59,7 @@ void saveConfiguration(const char *filename, const Config &config) {
   // Open file for writing
   File file = SD.open(filename, FILE_WRITE);
   if (!file) {
-    Serial.println(F("Failed to create file"));
+    Serial.println(F("Failed to create file in saveConfiguration!"));
     return;
   }
 
@@ -95,7 +95,8 @@ void saveConfiguration(const char *filename, const Config &config) {
 
   // Serialize JSON to file
   if (serializeJson(doc, file) == 0) {
-    Serial.println(F("Failed to write to file"));
+    Serial.println(F("Failed to write to file in saveConfiguration!"));
+    return;
   }
 
   // Close the file
@@ -110,7 +111,7 @@ void setConfiguration(const char *filename, Config &config) {
   // Open file for writing
   File file = SD.open(filename, FILE_WRITE);
   if (!file) {
-    Serial.println(F("Failed to create file"));
+    Serial.println(F("Failed to create file in setConfiguration!"));
     return;
   }
 
@@ -171,7 +172,8 @@ void setConfiguration(const char *filename, Config &config) {
 
   // Serialize JSON to file
   if (serializeJson(doc, file) == 0) {
-    Serial.println(F("Failed to write to file"));
+    Serial.println(F("Failed to write to file in setConfiguration!"));
+    return;
   }
 
   // Close the file
@@ -183,7 +185,7 @@ void printFile(const char *filename) {
   // Open file for reading
   File file = SD.open(filename);
   if (!file) {
-    Serial.println(F("Failed to read file"));
+    Serial.println(F("Failed to read file in printFile!"));
     return;
   }
 
@@ -202,8 +204,9 @@ void loadingNotSendedMeasure() {
   String filename = "temp_" + String(D) + ".txt";
   String j2;
   File file = SD.open(filename);
+  Serial.println(filename);
   if (!file) {
-    Serial.println(F("Failed to read file"));
+    Serial.println(F("Failed to read file in loadingNotSendedMeasure!"));
     return;
   }
   // Extract each characters by one by one
@@ -213,24 +216,26 @@ void loadingNotSendedMeasure() {
       StaticJsonDocument<200> doc;
       DeserializationError err = deserializeJson(doc, j2);
       if (err) {
-          Serial.println("dese() failed");
+          Serial.println("dese() failed!");
           return;
       }
       j2 = "";
       const char* key = doc["key"];
       const char* value = doc["value"];
       const char* timest = doc["timestamp"]; 
-      Serial.println(key);
-      Serial.println(value);
-      Serial.println(timest);
+      //Serial.println(key);
+      //Serial.println(value);
+      //Serial.println(timest);
       resendValueToWeb(value, key, timest);
-      delay(800);
+      delay(10);
      }else{
-     j2.concat(c);}
+       j2.concat(c);}
   }      
   //Serial.print((char)file.read());
   // Close the file
   file.close();
+  Serial.println(F("romove loadingNotSendedMeasure!"));
+  SD.remove(filename);
 }
 
 // Saves the configuration to a file
@@ -248,7 +253,8 @@ void saveValue(const String filename, const String value, const String timeStamp
       file = SD.open(filename, O_RDWR | O_CREAT);
       if (!file) {
           // It failed too, so give up.
-          Serial.println("Failed to open file.txt");
+          Serial.println("Failed to open" + filename + ".txt in saveValue!");
+          return;
       }
   }
 //  if (!file) {
@@ -275,6 +281,7 @@ void saveValue(const String filename, const String value, const String timeStamp
     // close the file:
     file.close();
   } else {
-    Serial.println(F("Failed to write to file"));
+    Serial.println(F("Failed to write to file! in saveValue"));
+    return ;
   }
 }

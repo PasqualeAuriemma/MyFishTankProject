@@ -84,12 +84,14 @@ void postHttpsRequest(String parameter1, String parameter2) {
     //Print HTTP return code
       Serial.println(payload + "["+String(httpCode)+"_ans]"); 
     }else{
+      value2.trim();
       Serial.println(var1 + ":" + String(value1) + ";" + String(value2) + "["+String(httpCode)+"_ans]");
     } 
     //Print request response payload
     //Serial.println(payload);    
     http.end();
   }else{
+    value2.trim();
     Serial.println(var1 + ":" + String(value1) + ";" + String(value2) + "["+String(408)+"_ans]");
   } 
 }

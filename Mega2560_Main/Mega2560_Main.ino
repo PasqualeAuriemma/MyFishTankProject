@@ -12,15 +12,18 @@
 #include <EEPROM.h>
 #include <OneWire.h>
 #include "DFRobot_PH.h"
+#include "GravityTDS.h"
 #include "MenuScreen/LCD.h"
 #include "MenuScreen/OLED.h"
 
 /***************************************************************/
 #define CHOOSE_SCREEN 2 // 1 LCD - 2 OLED 
+#define EC_PIN A1
 #define DS18B20_Pin  42
 #define PH_PIN A2
 #define SD_PIN 53
 #define TdsSensorPin A7
+
 #define VREF 5.00// analog reference voltage(Volt) of the ADC
 #define SCOUNT 30 // sum of sample point
 const byte keypadPin = A0;
@@ -28,6 +31,7 @@ const byte keypadPin = A0;
 OneWire ds(DS18B20_Pin);
 RTC_DS3231 RTC;
 DFRobot_PH ph;
+GravityTDS gravityTds;
 Screen *screen;
 
 /*MAPPATURA PIN ARDUINO MEGA 2560
@@ -154,27 +158,34 @@ void setup() {
 
   // Initialize SD library
   if (!SD.begin(SD_PIN)) {
-    Serial.println(F("Failed to initialize SD library"));
+    Serial.println(F("Failed to initialize SD library!"));
   } else {
-    Serial.println(F("Initialize SD library"));
+    Serial.println(F("Initialize SD library!"));
   }
 
   //SD.remove(filename);
   if (SD.exists(filename)) {
     // Should load default config if run for the first time
-    Serial.println(F("Loading configuration..."));
+    Serial.println(F("Loading configuration!"));
     loadConfiguration(filename, config);
   } else {
     // Create configuration file
-    Serial.println(F("Setting configuration..."));
+    Serial.println(F("Setting configuration!"));
     setConfiguration(filename, config);
   }
-  
+
+  //inizialize ph and ec class
+  ph.begin();
+  gravityTds.setPin(TdsSensorPin);
+  gravityTds.setAref(VREF);  //reference voltage on ADC, default 5.0V on Arduino UNO
+  gravityTds.setAdcRange(1024);  //1024 for 10bit ADC;4096 for 12bit ADC
+  gravityTds.begin();  //initialization
+ 
   Wire.begin();
   
   RTC.begin();
   if (! RTC.begin()) {
-    Serial.println("Couldn't find RTC");
+    Serial.println("Couldn't find RTC!");
     while (1);
   }
 
@@ -258,7 +269,7 @@ void loop() {
   // Sending EC values to web page if it is selected by menu
   if(screen->getManualSendingEC()){
     sendValueToWeb(ec, keyEC, now); 
-    screen->getManualSendingEC();
+    screen->setManualSendingEC(false);
   }  
   
 //  // Get PH monitoring values if it is selected by menu
@@ -333,7 +344,7 @@ void loop() {
   } else { // menu off
     screen->mainScreen(buffer, temperature, ec, phFinal);
   }
-  
+
   delay(frp);
   resetVar();
 }
