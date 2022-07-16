@@ -12,6 +12,7 @@ void serialEvent3() {
     // Cerca un comando nei dati ricevuti (il comando deve essere tra parentesi quadre)
     inString += inChar;
     if (inChar == ']') {
+      Serial.flush();
       if (inString.indexOf("Configured:[SSID]") > 0) {
         connStatus = "SSID";
       } else if (inString.indexOf("Connection:[OK]") > 0) {
@@ -20,23 +21,33 @@ void serialEvent3() {
         connStatus = "KO";
       } else if (inString.indexOf("Connection:[LOST]") > 0) {
         connStatus = "LOST";
-      }else if (inString.indexOf("[200_ans]") > 0) {
+      } else if (inString.indexOf("[200_ans]") > 0) {
         ("Sended");    
-      }else if (inString.indexOf("_ans]") > 0) {
-        Serial.println(inString);
+      } else if (inString.indexOf("_ans]") > 0) {
+        //Serial.println("\n arrivato: " + inString);
         byte dayAfter = D + 1;
         String msg = splitString(inString, '[', 0);
         String keyValue = splitString(msg, ';', 0);
         String timest = splitString(msg, ';', 1);
+        timest.trim();
         String key = splitString(keyValue, ':', 0);
+        key.trim();
         String value = splitString(keyValue, ':', 1);    
         String filename = "temp_" + String(dayAfter) + ".txt";
+        //Serial.println("filename: " + filename);
+        //Serial.println("value: " + value);
+        //Serial.println("timest: " + timest);
+        //Serial.println("key: " + key);
         saveValue(filename, value, timest, key);
       } else {
         ("Wrong command");
       }
       inString = "";
-    }
+    }else if(inChar == '!'){
+      Serial.flush();
+      inString = "";
+    }  
+    delay(1);
   }
 }
 

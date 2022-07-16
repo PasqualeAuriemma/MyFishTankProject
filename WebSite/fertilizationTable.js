@@ -210,7 +210,7 @@ $(document).on('click','.editbtnConfirmF',function(event){
       rowList.push($input.val());
     });
      $.ajax({
-      url:"Fertilization/update_quantities.php",
+      url:"PHSettingTable/update_quantities.php",
       type:"post",
       data:{potassio:rowList[0], magnesio:rowList[1], ferro:rowList[2], rinverdente:rowList[3], fosforo:rowList[4], azoto:rowList[5] , npk:rowList[6], id:id},
       success:function(data){   

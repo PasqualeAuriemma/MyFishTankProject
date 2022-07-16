@@ -40,9 +40,16 @@ void resendValueToWeb(String value, String key,  String timeStamp) {
 }
 
 void chackWhenResendMeasure(byte _hour, byte _minute) {
-    if (H == _hour && M == _minute && S != previousSecResend) {
+    if (H == _hour && M == _minute && S == 0 && S != previousSecResend) {
+    Serial.println("Sono qui! 1");  
     loadingNotSendedMeasure();
     previousSecResend = S;
+    }else{
+      
+      if(S > 0 && previousSecResend == 0){
+        Serial.println("Sono qui! 2");
+        previousSecResend = S;  
+      }
     }
 }
 
@@ -232,4 +239,27 @@ void manageTemperatureActiv(int rowItemManualMenu, int colItem) {
     config.onOffTemperature = false;
   }
   saveConfiguration(filename, config);
+}
+
+
+
+
+
+int p = 0;
+bool readSerial(char result[]){
+    while(Serial.available() > 0){
+        char inChar = Serial.read();
+        if(inChar == '\n'){
+             result[p] = '\0';
+             Serial.flush();
+             p=0;
+             return true;
+        }
+        if(inChar != '\r'){
+             result[p] = inChar;
+             p++;
+        }
+        delay(1);
+    }
+    return false;
 }
